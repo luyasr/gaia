@@ -17,7 +17,7 @@ type Error struct {
 
 // Error returns the string representation of the error message.
 func (e *Error) Error() string {
-	return fmt.Sprintf("error: code = %d reason = %s message = %s metadata = %v cause = %v", e.Code, e.Reason, e.Message, e.Metadata, e.cause)
+	return fmt.Sprintf("error: code=%d reason=%s message=%s metadata=%v cause=%v", e.Code, e.Reason, e.Message, e.Metadata, e.cause)
 }
 
 // Unwrap returns the cause of the error
