@@ -12,16 +12,12 @@ import (
 var C = new(config)
 
 type Config interface {
-	Load(path string) *config
+	Load(string) *config
 	Watch()
+	Merge(any) error
 }
 
 type config struct {
-	Http Http `json:"http"`
-}
-
-type Http struct {
-	Port int `json:"port"`
 }
 
 func pathParse(path string) (string, string, string) {
@@ -69,4 +65,8 @@ func (c *config) Watch() {
 	})
 
 	viper.WatchConfig()
+}
+
+func (c *config) Merge(cfg any) error {
+	return nil
 }

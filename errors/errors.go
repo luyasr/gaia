@@ -62,12 +62,12 @@ func New(code int, reason, message string) *Error {
 }
 
 // Errorf returns an error representing c, r, and a formatted message.
-func Errorf(code int, reason, message string, args ...any) *Error {
+func Errorf(code int, reason, format string, args ...any) *Error {
 	return &Error{
 		Status: Status{
 			Code:    int32(code),
 			Reason:  reason,
-			Message: fmt.Sprintf(message, args...),
+			Message: fmt.Sprintf(format, args...),
 		},
 	}
 }
