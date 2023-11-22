@@ -1,17 +1,21 @@
 package zerolog
 
 import (
-	"errors"
+	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/log"
 	"testing"
 )
 
 func TestNewLogger(t *testing.T) {
-	zLogger := NewConsoleLogger()
-	logger := NewLogger(&zLogger)
+	logger := NewLogger(NewConsoleLogger(), WithOptions(config{filename: "access.log"}))
 	helper := log.NewHelper(logger)
-	helper.Debug(1)
+	helper.Debug("hello world")
 	str := "??"
 	helper.Debugf("%s", str)
-	helper.Debugw("msg", 1, "error", errors.New("1"))
+	helper.Debugw("msg", 12345, "error", errors.Internal("login failed", "incorrect account name or password").Error())
+
+	filterLogger := NewLogger(NewConsoleLogger().With().CallerWithSkipFrameCount(log.DefaultFilterCaller).Logger())
+	filterHelper := log.NewHelper(log.NewFilter(filterLogger, log.FilterKey("password")))
+	filterHelper.Error("hello world")
+	filterHelper.Infow("password", "12345")
 }

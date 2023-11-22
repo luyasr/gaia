@@ -13,38 +13,61 @@ import (
 var _ log.Logger = (*Logger)(nil)
 
 type Logger struct {
-	log *zerolog.Logger
+	log    zerolog.Logger
+	config config
 }
 
-func NewLogger(logger *zerolog.Logger) *Logger {
-	return &Logger{
-		log: logger,
+type config struct {
+	filename string
+}
+
+type Option func(*Logger)
+
+func init() {
+	zerolog.TimeFieldFormat = time.DateTime
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+}
+
+// WithOptions set options for logger.
+func WithOptions(config config) Option {
+	return func(l *Logger) {
+		l.config = config
 	}
 }
 
+func NewLogger(logger zerolog.Logger, opts ...Option) *Logger {
+	options := &Logger{
+		log: logger,
+	}
+
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	return options
+}
+
 func NewConsoleLogger() zerolog.Logger {
-	zerolog.TimeFieldFormat = time.DateTime
-	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
-	return zerolog.New(console()).With().Timestamp().Logger()
+	return zerolog.New(console()).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger()
 }
 
 func console() zerolog.ConsoleWriter {
 	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.DateTime}
 	output.FormatLevel = func(i interface{}) string {
-		return strings.ToUpper(fmt.Sprintf("| %-6s |", i))
+		return strings.ToUpper(fmt.Sprintf("| %-6s|", i))
 	}
 
 	return output
 }
 
-func (l *Logger) Log(level log.Level, keyValues ...any) error {
+func (l *Logger) Log(level log.Level, kvs ...any) error {
 	var event *zerolog.Event
-	if len(keyValues) == 0 {
+	if len(kvs) == 0 {
 		return nil
 	}
 
-	if len(keyValues)&1 == 1 {
-		keyValues = append(keyValues, "")
+	if len(kvs)&1 == 1 {
+		kvs = append(kvs, "")
 	}
 
 	switch level {
@@ -62,12 +85,12 @@ func (l *Logger) Log(level log.Level, keyValues ...any) error {
 		event = l.log.Info()
 	}
 
-	for i := 0; i < len(keyValues); i += 2 {
-		key, ok := keyValues[i].(string)
+	for i := 0; i < len(kvs); i += 2 {
+		key, ok := kvs[i].(string)
 		if !ok {
 			continue
 		}
-		event = event.Any(key, keyValues[i+1])
+		event = event.Any(key, kvs[i+1])
 	}
 
 	event.Send()

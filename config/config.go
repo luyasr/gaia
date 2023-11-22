@@ -9,22 +9,38 @@ import (
 	"strings"
 )
 
-var C = new(config)
-
 type Config interface {
-	Load(string, any) *config
+	Read() *config
 	Watch() *config
 }
 
 type config struct {
-	cfg any
+	path string
+	cfg  any
+}
+
+type Option func(*config)
+
+func Load(path string, cfgObj any) Option {
+	return func(c *config) {
+		c.path = path
+		c.cfg = cfgObj
+	}
+}
+
+func New(opts ...Option) Config {
+	options := &config{}
+
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	return options
 }
 
 // Load loads the config from the given path.
-func (c *config) Load(path string, cfgObj any) *config {
-	c.cfg = cfgObj
-
-	dir, filenameOnly, extension := pathParse(path)
+func (c *config) Read() *config {
+	dir, filenameOnly, extension := pathParse(c.path)
 	viper.AddConfigPath(dir)
 	viper.SetConfigName(filenameOnly)
 	viper.SetConfigType(extension)

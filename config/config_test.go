@@ -13,7 +13,7 @@ func TestConfig_Load(t *testing.T) {
 	}
 
 	c := new(config)
-	C.Load("../config.yaml", c)
-
+	cf := New(Load("config.yaml", c))
+	cf.Read().Watch()
 	t.Log(c)
 }
