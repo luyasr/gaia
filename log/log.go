@@ -1,5 +1,5 @@
 package log
 
 type Logger interface {
-	Log()
+	Log(level Level, keyValues ...any) error
 }
