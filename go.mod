@@ -3,10 +3,12 @@ module github.com/luyasr/gaia
 go 1.20
 
 require (
+	dario.cat/mergo v1.0.0
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/rs/zerolog v1.31.0
 	github.com/spf13/viper v1.17.0
 	google.golang.org/protobuf v1.31.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (

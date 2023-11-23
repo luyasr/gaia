@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewLogger(t *testing.T) {
-	logger := NewLogger(NewConsoleLogger(), WithOptions(config{filename: "access.log"}))
+	logger := NewLogger(NewConsoleLogger())
 	helper := log.NewHelper(logger)
 	helper.Debug("hello world")
 	str := "??"
@@ -18,4 +18,6 @@ func TestNewLogger(t *testing.T) {
 	filterHelper := log.NewHelper(log.NewFilter(filterLogger, log.FilterKey("password")))
 	filterHelper.Error("hello world")
 	filterHelper.Infow("password", "12345")
+
+	NewLogger(NewFileLogger(Config{Filename: "acc.log"}))
 }

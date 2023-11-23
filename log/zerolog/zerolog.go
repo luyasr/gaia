@@ -1,10 +1,14 @@
 package zerolog
 
 import (
+	"dario.cat/mergo"
 	"fmt"
 	"github.com/luyasr/gaia/log"
+	"github.com/luyasr/gaia/reflection"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
+	"gopkg.in/natefinch/lumberjack.v2"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -13,12 +17,7 @@ import (
 var _ log.Logger = (*Logger)(nil)
 
 type Logger struct {
-	log    zerolog.Logger
-	config config
-}
-
-type config struct {
-	filename string
+	log zerolog.Logger
 }
 
 type Option func(*Logger)
@@ -26,13 +25,6 @@ type Option func(*Logger)
 func init() {
 	zerolog.TimeFieldFormat = time.DateTime
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
-}
-
-// WithOptions set options for logger.
-func WithOptions(config config) Option {
-	return func(l *Logger) {
-		l.config = config
-	}
 }
 
 func NewLogger(logger zerolog.Logger, opts ...Option) *Logger {
@@ -51,6 +43,30 @@ func NewConsoleLogger() zerolog.Logger {
 	return zerolog.New(console()).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger()
 }
 
+func NewFileLogger(config Config) zerolog.Logger {
+	var defaultConfig Config
+	// use reflection to set tag
+	reflection.SetUp(&defaultConfig)
+	// merge the default configuration with the configuration passed in
+	_ = mergo.Merge(&defaultConfig, config, mergo.WithOverride)
+	writer := rotate(defaultConfig)
+
+	return zerolog.New(writer).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger()
+}
+
+func NewMultiLogger(config Config) zerolog.Logger {
+	var defaultConfig Config
+	// use reflection to set tag
+	reflection.SetUp(&defaultConfig)
+	// merge the default configuration with the configuration passed in
+	_ = mergo.Merge(&defaultConfig, config, mergo.WithOverride)
+	writer := rotate(defaultConfig)
+	multi := zerolog.MultiLevelWriter(console(), writer)
+
+	return zerolog.New(multi).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger()
+}
+
+// console format the output
 func console() zerolog.ConsoleWriter {
 	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.DateTime}
 	output.FormatLevel = func(i interface{}) string {
@@ -58,6 +74,19 @@ func console() zerolog.ConsoleWriter {
 	}
 
 	return output
+}
+
+// rotate the log by size
+func rotate(config Config) io.Writer {
+	sizeRotate := &lumberjack.Logger{
+		Filename:   config.Filename,
+		MaxSize:    config.MaxSize,
+		MaxBackups: config.MaxBackups,
+		MaxAge:     config.MaxAge,
+		Compress:   config.Compress,
+	}
+
+	return sizeRotate
 }
 
 func (l *Logger) Log(level log.Level, kvs ...any) error {
