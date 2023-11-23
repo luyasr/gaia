@@ -29,7 +29,8 @@ func FilterValue(value ...any) FilterOption {
 	}
 }
 
-func FilterFunc(filterFunc func(level Level, keyValues ...any) bool) FilterOption {
+// FilterFunc is a FilterOption that sets the filter function of the Filter.
+func FilterFunc(filterFunc func(level Level, args ...any) bool) FilterOption {
 	return func(f *Filter) {
 		f.filter = filterFunc
 	}
@@ -40,7 +41,7 @@ type Filter struct {
 	level  Level
 	key    map[any]struct{}
 	value  map[any]struct{}
-	filter func(level Level, keyValues ...any) bool
+	filter func(level Level, args ...any) bool
 }
 
 func NewFilter(logger Logger, opts ...FilterOption) *Filter {
@@ -58,29 +59,29 @@ func NewFilter(logger Logger, opts ...FilterOption) *Filter {
 }
 
 // Log print the kv pairs log.
-func (f *Filter) Log(level Level, keyValues ...any) error {
+func (f *Filter) Log(level Level, args ...any) {
 	if level < f.level {
-		return nil
+		return
 	}
 
-	if f.filter != nil && f.filter(level, keyValues...) {
-		return nil
+	if f.filter != nil && f.filter(level, args...) {
+		return
 	}
 
 	if len(f.key) > 0 || len(f.value) > 0 {
-		for i := 0; i < len(keyValues); i += 2 {
+		for i := 0; i < len(args); i += 2 {
 			v := i + 1
-			if v > len(keyValues) {
+			if v > len(args) {
 				continue
 			}
-			if _, ok := f.key[keyValues[i]]; ok {
-				keyValues[v] = fuzzyStr
+			if _, ok := f.key[args[i]]; ok {
+				args[v] = fuzzyStr
 			}
-			if _, ok := f.value[keyValues[i+1]]; ok {
-				keyValues[v] = fuzzyStr
+			if _, ok := f.value[args[i+1]]; ok {
+				args[v] = fuzzyStr
 			}
 		}
 	}
 
-	return f.logger.Log(level, keyValues...)
+	f.logger.Log(level, args...)
 }

@@ -27,6 +27,7 @@ func init() {
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 }
 
+// NewLogger creates a new logger with Logger
 func NewLogger(logger zerolog.Logger, opts ...Option) *Logger {
 	options := &Logger{
 		log: logger,
@@ -39,10 +40,12 @@ func NewLogger(logger zerolog.Logger, opts ...Option) *Logger {
 	return options
 }
 
+// NewConsoleLogger creates a new logger with ConsoleWriter
 func NewConsoleLogger() zerolog.Logger {
 	return zerolog.New(console()).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger()
 }
 
+// NewFileLogger creates a new logger with FileWriter
 func NewFileLogger(config Config) zerolog.Logger {
 	var defaultConfig Config
 	// use reflection to set tag
@@ -54,6 +57,7 @@ func NewFileLogger(config Config) zerolog.Logger {
 	return zerolog.New(writer).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger()
 }
 
+// NewMultiLogger creates a new logger with MultiWriter
 func NewMultiLogger(config Config) zerolog.Logger {
 	var defaultConfig Config
 	// use reflection to set tag
@@ -89,39 +93,38 @@ func rotate(config Config) io.Writer {
 	return sizeRotate
 }
 
-func (l *Logger) Log(level log.Level, kvs ...any) error {
+func (l *Logger) Log(level log.Level, args ...any) {
 	var event *zerolog.Event
-	if len(kvs) == 0 {
-		return nil
+	if len(args) == 0 {
+		return
 	}
 
-	if len(kvs)&1 == 1 {
-		kvs = append(kvs, "")
+	if len(args)&1 == 1 {
+		args = append(args, "")
 	}
 
 	switch level {
-	case log.DebugLevel:
+	case log.LevelDebug:
 		event = l.log.Debug()
-	case log.InfoLevel:
+	case log.LevelInfo:
 		event = l.log.Info()
-	case log.WarnLevel:
+	case log.LevelWarn:
 		event = l.log.Warn()
-	case log.ErrorLevel:
+	case log.LevelError:
 		event = l.log.Error()
-	case log.FatalLevel:
+	case log.LevelFatal:
 		event = l.log.Fatal()
 	default:
 		event = l.log.Info()
 	}
 
-	for i := 0; i < len(kvs); i += 2 {
-		key, ok := kvs[i].(string)
+	for i := 0; i < len(args); i += 2 {
+		key, ok := args[i].(string)
 		if !ok {
 			continue
 		}
-		event = event.Any(key, kvs[i+1])
+		event = event.Any(key, args[i+1])
 	}
 
 	event.Send()
-	return nil
 }

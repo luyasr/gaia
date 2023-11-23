@@ -8,7 +8,7 @@ import (
 // DefaultMessageKey is the default key for message field.
 var DefaultMessageKey = "msg"
 
-// Helper is a wrapper of Logger.
+// Option Helper is a wrapper of Logger.
 type Option func(*Helper)
 
 type Helper struct {
@@ -52,69 +52,69 @@ func NewHelper(logger Logger, opts ...Option) *Helper {
 	return options
 }
 
-func (h *Helper) Log(level Level, keyValues ...any) error {
-	return h.logger.Log(level, keyValues...)
+func (h *Helper) Log(level Level, args ...any) {
+	h.logger.Log(level, args...)
 }
 
 func (h *Helper) Debug(a ...any) {
-	_ = h.logger.Log(DebugLevel, h.msgKey, h.sprint(a...))
+	h.logger.Log(LevelDebug, h.msgKey, h.sprint(a...))
 }
 
 func (h *Helper) Debugf(format string, a ...any) {
-	_ = h.logger.Log(DebugLevel, h.msgKey, h.sprintf(format, a...))
+	h.logger.Log(LevelDebug, h.msgKey, h.sprintf(format, a...))
 }
 
-func (h *Helper) Debugw(keyValues ...any) {
-	_ = h.logger.Log(DebugLevel, keyValues...)
+func (h *Helper) Debugw(args ...any) {
+	h.logger.Log(LevelDebug, args...)
 }
 
 func (h *Helper) Info(a ...any) {
-	_ = h.logger.Log(InfoLevel, h.msgKey, h.sprint(a...))
+	h.logger.Log(LevelInfo, h.msgKey, h.sprint(a...))
 }
 
 func (h *Helper) Infof(format string, a ...any) {
-	_ = h.logger.Log(InfoLevel, h.msgKey, h.sprintf(format, a...))
+	h.logger.Log(LevelInfo, h.msgKey, h.sprintf(format, a...))
 }
 
-func (h *Helper) Infow(keyValues ...any) {
-	_ = h.logger.Log(InfoLevel, keyValues...)
+func (h *Helper) Infow(args ...any) {
+	h.logger.Log(LevelInfo, args...)
 }
 
 func (h *Helper) Warn(a ...any) {
-	_ = h.logger.Log(WarnLevel, h.msgKey, h.sprint(a...))
+	h.logger.Log(LevelWarn, h.msgKey, h.sprint(a...))
 }
 
 func (h *Helper) Warnf(format string, a ...any) {
-	_ = h.logger.Log(WarnLevel, h.msgKey, h.sprintf(format, a...))
+	h.logger.Log(LevelWarn, h.msgKey, h.sprintf(format, a...))
 }
 
-func (h *Helper) Warnw(keyValues ...any) {
-	_ = h.logger.Log(WarnLevel, keyValues...)
+func (h *Helper) Warnw(args ...any) {
+	h.logger.Log(LevelWarn, args...)
 }
 
 func (h *Helper) Error(a ...any) {
-	_ = h.logger.Log(ErrorLevel, h.msgKey, h.sprint(a...))
+	h.logger.Log(LevelError, h.msgKey, h.sprint(a...))
 }
 
 func (h *Helper) Errorf(format string, a ...any) {
-	_ = h.logger.Log(ErrorLevel, h.msgKey, h.sprintf(format, a...))
+	h.logger.Log(LevelError, h.msgKey, h.sprintf(format, a...))
 }
 
-func (h *Helper) Errorw(keyValues ...any) {
-	_ = h.logger.Log(ErrorLevel, keyValues...)
+func (h *Helper) Errorw(args ...any) {
+	h.logger.Log(LevelError, args...)
 }
 
 func (h *Helper) Fatal(a ...any) {
-	_ = h.logger.Log(FatalLevel, h.msgKey, h.sprint(a...))
+	h.logger.Log(LevelFatal, h.msgKey, h.sprint(a...))
 	os.Exit(1)
 }
 
 func (h *Helper) Fatalf(format string, a ...any) {
-	_ = h.logger.Log(FatalLevel, h.msgKey, h.sprintf(format, a...))
+	h.logger.Log(LevelFatal, h.msgKey, h.sprintf(format, a...))
 	os.Exit(1)
 }
 
-func (h *Helper) Fatalw(keyValues ...any) {
-	_ = h.logger.Log(FatalLevel, keyValues...)
+func (h *Helper) Fatalw(args ...any) {
+	h.logger.Log(LevelFatal, args...)
 	os.Exit(1)
 }
