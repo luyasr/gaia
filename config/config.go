@@ -3,8 +3,8 @@ package config
 import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/luyasr/gaia/errors"
+	"github.com/luyasr/gaia/log"
 	"github.com/spf13/viper"
-	"log"
 	"path/filepath"
 	"strings"
 )
@@ -62,7 +62,7 @@ func (c *config) Read() *config {
 // Watch watches the config file.
 func (c *config) Watch() *config {
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		log.Printf("Config file changed: %s \n", e.Name)
+		log.Infof("Config file changed: %s", e.Name)
 		if err := viper.Unmarshal(&c.cfg); err != nil {
 			handleError(err, "unmarshal conf failed")
 		}
@@ -87,6 +87,6 @@ func pathParse(path string) (string, string, string) {
 // handleError handles the error.
 func handleError(err error, message string) {
 	if err != nil {
-		log.Fatal(errors.Internal(message, err.Error()))
+		log.Fatal(errors.Internal(message, err.Error()).Error())
 	}
 }

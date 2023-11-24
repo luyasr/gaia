@@ -95,6 +95,7 @@ func rotate(config Config) io.Writer {
 
 func (l *Logger) Log(level log.Level, args ...any) {
 	var event *zerolog.Event
+
 	if len(args) == 0 {
 		return
 	}
@@ -111,11 +112,9 @@ func (l *Logger) Log(level log.Level, args ...any) {
 	case log.LevelWarn:
 		event = l.log.Warn()
 	case log.LevelError:
-		event = l.log.Error()
+		event = l.log.Error().Stack()
 	case log.LevelFatal:
-		event = l.log.Fatal()
-	default:
-		event = l.log.Info()
+		event = l.log.Fatal().Stack()
 	}
 
 	for i := 0; i < len(args); i += 2 {

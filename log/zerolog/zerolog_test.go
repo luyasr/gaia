@@ -9,7 +9,7 @@ import (
 func TestNewLogger(t *testing.T) {
 	logger := NewLogger(NewConsoleLogger())
 	helper := log.NewHelper(logger)
-	helper.Debug("hello world")
+	helper.Debug("")
 	str := "??"
 	helper.Debugf("%s", str)
 	helper.Debugw("msg", 12345, "error", errors.Internal("login failed", "incorrect account name or password").Error())

@@ -52,8 +52,8 @@ func NewHelper(logger Logger, opts ...Option) *Helper {
 	return options
 }
 
-func (h *Helper) Log(level Level, args ...any) {
-	h.logger.Log(level, args...)
+func (h *Helper) Log(level Level, a ...any) {
+	h.logger.Log(level, a...)
 }
 
 func (h *Helper) Debug(a ...any) {
@@ -64,8 +64,8 @@ func (h *Helper) Debugf(format string, a ...any) {
 	h.logger.Log(LevelDebug, h.msgKey, h.sprintf(format, a...))
 }
 
-func (h *Helper) Debugw(args ...any) {
-	h.logger.Log(LevelDebug, args...)
+func (h *Helper) Debugw(a ...any) {
+	h.logger.Log(LevelDebug, a...)
 }
 
 func (h *Helper) Info(a ...any) {
@@ -76,8 +76,8 @@ func (h *Helper) Infof(format string, a ...any) {
 	h.logger.Log(LevelInfo, h.msgKey, h.sprintf(format, a...))
 }
 
-func (h *Helper) Infow(args ...any) {
-	h.logger.Log(LevelInfo, args...)
+func (h *Helper) Infow(a ...any) {
+	h.logger.Log(LevelInfo, a...)
 }
 
 func (h *Helper) Warn(a ...any) {
@@ -88,8 +88,8 @@ func (h *Helper) Warnf(format string, a ...any) {
 	h.logger.Log(LevelWarn, h.msgKey, h.sprintf(format, a...))
 }
 
-func (h *Helper) Warnw(args ...any) {
-	h.logger.Log(LevelWarn, args...)
+func (h *Helper) Warnw(a ...any) {
+	h.logger.Log(LevelWarn, a...)
 }
 
 func (h *Helper) Error(a ...any) {
@@ -100,8 +100,8 @@ func (h *Helper) Errorf(format string, a ...any) {
 	h.logger.Log(LevelError, h.msgKey, h.sprintf(format, a...))
 }
 
-func (h *Helper) Errorw(args ...any) {
-	h.logger.Log(LevelError, args...)
+func (h *Helper) Errorw(a ...any) {
+	h.logger.Log(LevelError, a...)
 }
 
 func (h *Helper) Fatal(a ...any) {
@@ -114,7 +114,7 @@ func (h *Helper) Fatalf(format string, a ...any) {
 	os.Exit(1)
 }
 
-func (h *Helper) Fatalw(args ...any) {
-	h.logger.Log(LevelFatal, args...)
+func (h *Helper) Fatalw(a ...any) {
+	h.logger.Log(LevelFatal, a...)
 	os.Exit(1)
 }

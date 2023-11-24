@@ -1,6 +1,7 @@
 package log
 
 import (
+	"context"
 	"log/slog"
 	"runtime"
 	"strconv"
@@ -71,5 +72,7 @@ func (s *Slog) Log(level Level, args ...any) {
 		s.logger.With("caller", caller(defaultSlogCaller)).Warn(args[0].(string), args[1:]...)
 	case LevelError:
 		s.logger.With("caller", caller(defaultSlogCaller)).Error(args[0].(string), args[1:]...)
+	case LevelFatal:
+		s.logger.With("caller", caller(defaultSlogCaller)).Log(context.Background(), SlogLevelFatal, args[0].(string), args[1:]...)
 	}
 }
