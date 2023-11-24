@@ -11,23 +11,27 @@ import (
 
 type Config interface {
 	Read() *config
-	Watch() *config
+	Watch()
 }
 
 type config struct {
-	path string
-	cfg  any
+	// filepath is the path of the config file.
+	filepath string
+	// cfg is the config object.
+	cfg any
 }
 
 type Option func(*config)
 
-func Load(path string, cfgObj any) Option {
+// LoadFile loads the config from the given path.
+func LoadFile(filepath string, cfgObj any) Option {
 	return func(c *config) {
-		c.path = path
+		c.filepath = filepath
 		c.cfg = cfgObj
 	}
 }
 
+// New creates a new config.
 func New(opts ...Option) Config {
 	options := &config{}
 
@@ -40,7 +44,7 @@ func New(opts ...Option) Config {
 
 // Load loads the config from the given path.
 func (c *config) Read() *config {
-	dir, filenameOnly, extension := pathParse(c.path)
+	dir, filenameOnly, extension := pathParse(c.filepath)
 	viper.AddConfigPath(dir)
 	viper.SetConfigName(filenameOnly)
 	viper.SetConfigType(extension)
@@ -60,7 +64,7 @@ func (c *config) Read() *config {
 }
 
 // Watch watches the config file.
-func (c *config) Watch() *config {
+func (c *config) Watch() {
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		log.Infof("Config file changed: %s", e.Name)
 		if err := viper.Unmarshal(&c.cfg); err != nil {
@@ -69,8 +73,6 @@ func (c *config) Watch() *config {
 	})
 
 	viper.WatchConfig()
-
-	return c
 }
 
 // pathParse parses the path and returns the dir, filename and extension.
