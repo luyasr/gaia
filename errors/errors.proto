@@ -5,6 +5,7 @@ package errors;
 option go_package = "github.com/luyasr/gaia/errors";
 
 message Status {
+  // @gotags: validate:"omitempty"
   int32 code = 1;
   string reason = 2;
   string message = 3;

@@ -10,6 +10,7 @@ install: ## Install dependencies
 
 proto: ## Generate gRPC code
 	@protoc -I=. -I=../.. --go_out=. --go_opt=module=${PKG} --go-grpc_out=. --go-grpc_opt=module=${PKG} */*.proto
+	@protoc-go-inject-tag -input="*/*.pb.go"
 	@go fmt ./...
 
 help: ## Display this help screen
