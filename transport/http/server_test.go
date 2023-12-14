@@ -9,7 +9,7 @@ import (
 )
 
 func TestServerRun(t *testing.T) {
-	s := NewServer(WithAddr(":8080"), WithHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s := NewServer(Address(":8080"), Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})))
 
@@ -26,7 +26,7 @@ func TestServerRun(t *testing.T) {
 }
 
 func TestServerShutdown(t *testing.T) {
-	s := NewServer(WithAddr(":8080"), WithHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s := NewServer(Address(":8080"), Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})))
 
@@ -46,7 +46,7 @@ func TestServerShutdown(t *testing.T) {
 }
 
 func TestServerWithInvalidAddr(t *testing.T) {
-	s := NewServer(WithAddr("invalid"), WithHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s := NewServer(Address("invalid"), Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})))
 
@@ -55,7 +55,7 @@ func TestServerWithInvalidAddr(t *testing.T) {
 }
 
 func TestServerWithNilHandler(t *testing.T) {
-	s := NewServer(WithAddr(":8080"), WithHandler(nil))
+	s := NewServer(Address(":8080"), Handler(nil))
 
 	err := s.Run()
 	assert.Error(t, err)

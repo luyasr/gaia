@@ -37,7 +37,7 @@ func WithSprintf(sprintf func(format string, a ...any) string) Option {
 }
 
 // NewHelper creates a new Helper.
-func NewHelper(logger Logger, opts ...Option) *Helper {
+func NewHelper(logger Logger, opt ...Option) *Helper {
 	options := &Helper{
 		logger:  logger,
 		msgKey:  DefaultMessageKey,
@@ -45,8 +45,8 @@ func NewHelper(logger Logger, opts ...Option) *Helper {
 		sprintf: fmt.Sprintf,
 	}
 
-	for _, opt := range opts {
-		opt(options)
+	for _, o := range opt {
+		o(options)
 	}
 
 	return options

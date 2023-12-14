@@ -17,28 +17,28 @@ type Server struct {
 
 type ServerOption func(*Server)
 
-func WithAddr(addr string) ServerOption {
+func Address(address string) ServerOption {
 	return func(s *Server) {
-		s.server.Addr = addr
+		s.server.Addr = address
 	}
 }
 
-func WithHandler(handler http.Handler) ServerOption {
+func Handler(handler http.Handler) ServerOption {
 	return func(s *Server) {
 		s.server.Handler = handler
 	}
 }
 
-func NewServer(opts ...ServerOption) *Server {
-	logger := zerolog.New(zerolog.NewConsoleLogger())
+func NewServer(opt ...ServerOption) *Server {
+	logger := zerolog.New(zerolog.ConsoleLogger)
 
 	svc := &Server{
 		server: &http.Server{},
 		log:    log.NewHelper(logger),
 	}
 
-	for _, opt := range opts {
-		opt(svc)
+	for _, o := range opt {
+		o(svc)
 	}
 
 	return svc
