@@ -20,4 +20,6 @@ func TestNew(t *testing.T) {
 	filterHelper.Infow("password", "12345")
 
 	New(NewFileLogger(Config{Filename: "acc.log"}))
+
+	ConsoleLogger.Info().Str("error", "error").Send()
 }

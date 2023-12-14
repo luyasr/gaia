@@ -14,13 +14,13 @@ import (
 	"time"
 )
 
+const caller = 2
+
 var _ log.Logger = (*Logger)(nil)
 
-// the default logger provided
+// ConsoleLogger default logger
 var (
-	ConsoleLogger = NewConsoleLogger()
-	FileLogger    = NewFileLogger(Config{})
-	MultiLogger   = NewMultiLogger(Config{})
+	ConsoleLogger = zerolog.New(console()).With().Timestamp().CallerWithSkipFrameCount(caller).Logger()
 )
 
 type Logger struct {
