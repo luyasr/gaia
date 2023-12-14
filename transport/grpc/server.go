@@ -25,7 +25,7 @@ func Address(address string) ServerOption {
 func NewServer(opt ...ServerOption) *Server {
 	svc := &Server{
 		server: &grpc.Server{},
-		log:    log.NewHelper(zerolog.New(zerolog.ConsoleLogger)),
+		log:    log.NewHelper(zerolog.New(zerolog.NewConsoleLogger())),
 	}
 
 	for _, o := range opt {
