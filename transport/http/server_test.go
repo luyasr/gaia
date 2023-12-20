@@ -9,7 +9,7 @@ import (
 )
 
 func TestServerRun(t *testing.T) {
-	s := NewServer(Address(":8080"), Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s := NewServer(Address(""), Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})))
 

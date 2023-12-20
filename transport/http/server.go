@@ -5,6 +5,7 @@ import (
 	"github.com/luyasr/gaia/log"
 	"github.com/luyasr/gaia/log/zerolog"
 	"github.com/luyasr/gaia/transport"
+	"net"
 	"net/http"
 )
 
@@ -49,6 +50,9 @@ func NewServer(opt ...ServerOption) *Server {
 }
 
 func (s *Server) Run() error {
+	if !isValidAddress(s.server.Addr) {
+		s.server.Addr = ":8080"
+	}
 	s.log.Infof("http server listen on %s", s.server.Addr)
 	return s.server.ListenAndServe()
 }
@@ -56,4 +60,10 @@ func (s *Server) Run() error {
 func (s *Server) Shutdown(ctx context.Context) error {
 	s.log.Info("http server shutdown...")
 	return s.Shutdown(ctx)
+}
+
+func isValidAddress(address string) bool {
+	_, _, err := net.SplitHostPort(address)
+
+	return err == nil
 }
