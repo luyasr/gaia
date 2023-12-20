@@ -11,6 +11,11 @@ import (
 
 var _ transport.Server = (*Server)(nil)
 
+const (
+	// defaultAddress is the default address of http server
+	defaultAddress = ":8080"
+)
+
 type Server struct {
 	server *http.Server
 	log    *log.Helper
@@ -51,7 +56,8 @@ func NewServer(opt ...ServerOption) *Server {
 
 func (s *Server) Run() error {
 	if !isValidAddress(s.server.Addr) {
-		s.server.Addr = ":8080"
+		s.log.Warnf("http server address %s is invalid, use default address %s", s.server.Addr, defaultAddress)
+		s.server.Addr = defaultAddress
 	}
 	s.log.Infof("http server listen on %s", s.server.Addr)
 	return s.server.ListenAndServe()
