@@ -7,7 +7,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	logger := New(ConsoleLogger)
+	logger := New(NewConsoleLogger())
 	helper := log.NewHelper(logger)
 	helper.Debug("")
 	str := "??"
@@ -20,6 +20,4 @@ func TestNew(t *testing.T) {
 	filterHelper.Infow("password", "12345")
 
 	New(NewFileLogger(Config{Filename: "acc.log"}))
-
-	ConsoleLogger.Info().Str("error", "error").Send()
 }

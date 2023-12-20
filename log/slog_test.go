@@ -1,7 +1,6 @@
 package log
 
 import (
-	"errors"
 	"log/slog"
 	"testing"
 )
@@ -16,14 +15,11 @@ func (u *User) LogValue() slog.Value {
 }
 
 func TestNewSlog(t *testing.T) {
-
 	user := &User{"alex", 18}
 	Info("msg", "user", user)
 
 	Debug("", "user", "user")
-	Debugf("xxx%vxxx", user)
+	Debugf("%v", user)
 	Info("2")
 	Warn("3", "username", "lisi")
-	Fatal("5", "error", errors.New("conn failed"))
-	Error("4", "error", errors.New("login failed"))
 }

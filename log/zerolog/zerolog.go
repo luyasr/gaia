@@ -14,14 +14,7 @@ import (
 	"time"
 )
 
-const caller = 2
-
 var _ log.Logger = (*Logger)(nil)
-
-// ConsoleLogger default logger
-var (
-	ConsoleLogger = zerolog.New(console()).With().Timestamp().CallerWithSkipFrameCount(caller).Logger()
-)
 
 type Logger struct {
 	log zerolog.Logger

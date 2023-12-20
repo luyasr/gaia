@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -36,6 +37,10 @@ func HandlerOptions() *slog.HandlerOptions {
 	return &slog.HandlerOptions{
 		Level: SlogLevelDebug,
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if a.Key == slog.TimeKey {
+				a.Value = slog.StringValue(a.Value.Time().Format(time.DateTime))
+			}
+
 			if a.Key == slog.LevelKey {
 				level := a.Value.Any().(slog.Level)
 				levelLabel, exists := SlogLevels[level]
