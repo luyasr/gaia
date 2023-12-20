@@ -2,10 +2,16 @@ package grpc
 
 import (
 	"context"
+	"net"
+
 	"github.com/luyasr/gaia/log"
 	"github.com/luyasr/gaia/log/zerolog"
+	"github.com/luyasr/gaia/transport"
 	"google.golang.org/grpc"
-	"net"
+)
+
+const (
+	defaultAddress = ":50051"
 )
 
 type Server struct {
@@ -36,6 +42,11 @@ func NewServer(opt ...ServerOption) *Server {
 }
 
 func (s *Server) Run() error {
+	if !transport.IsValidAddress(s.address) {
+		s.log.Warnf("grpc server address %s is invalid, use default address %s", s.address, defaultAddress)
+		s.address = defaultAddress
+	}
+
 	s.log.Infof("grpc server listen on %s", s.address)
 	listen, err := net.Listen("tcp", s.address)
 	if err != nil {

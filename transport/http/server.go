@@ -5,7 +5,6 @@ import (
 	"github.com/luyasr/gaia/log"
 	"github.com/luyasr/gaia/log/zerolog"
 	"github.com/luyasr/gaia/transport"
-	"net"
 	"net/http"
 )
 
@@ -55,21 +54,16 @@ func NewServer(opt ...ServerOption) *Server {
 }
 
 func (s *Server) Run() error {
-	if !isValidAddress(s.server.Addr) {
+	if !transport.IsValidAddress(s.server.Addr) {
 		s.log.Warnf("http server address %s is invalid, use default address %s", s.server.Addr, defaultAddress)
 		s.server.Addr = defaultAddress
 	}
+	
 	s.log.Infof("http server listen on %s", s.server.Addr)
 	return s.server.ListenAndServe()
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
 	s.log.Info("http server shutdown...")
-	return s.Shutdown(ctx)
-}
-
-func isValidAddress(address string) bool {
-	_, _, err := net.SplitHostPort(address)
-
-	return err == nil
+	return s.server.Shutdown(ctx)
 }
