@@ -54,6 +54,6 @@ func (s *Server) Run() error {
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	s.log.Infof("http server shutdown...")
+	s.log.Info("http server shutdown...")
 	return s.Shutdown(ctx)
 }
