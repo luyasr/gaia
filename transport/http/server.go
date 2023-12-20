@@ -29,10 +29,16 @@ func Handler(handler http.Handler) ServerOption {
 	}
 }
 
+func Logger(logger *log.Helper) ServerOption {
+	return func(s *Server) {
+		s.log = logger
+	}
+}
+
 func NewServer(opt ...ServerOption) *Server {
 	svc := &Server{
 		server: &http.Server{},
-		log:    log.NewHelper(zerolog.New(zerolog.NewConsoleLogger())),
+		log:    log.NewHelper(zerolog.New(zerolog.DefaultLogger)),
 	}
 
 	for _, o := range opt {
