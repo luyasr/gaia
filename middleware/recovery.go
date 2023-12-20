@@ -1,4 +1,4 @@
-package recovery
+package middleware
 
 import (
 	"github.com/gin-gonic/gin"
@@ -26,7 +26,7 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 
 				httpRequest, _ := httputil.DumpRequest(c.Request, false)
 				if brokenPipe {
-					zerolog.ConsoleLogger.Error().
+					zerolog.DefaultLogger.Error().
 						Any("errors", err).
 						Str("request", string(httpRequest)).
 						Send()
@@ -37,13 +37,13 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 				}
 
 				if stack {
-					zerolog.ConsoleLogger.Error().
+					zerolog.DefaultLogger.Error().
 						Any("errors", err).
 						Str("request", string(httpRequest)).
 						Str("stack", string(debug.Stack())).
 						Send()
 				} else {
-					zerolog.ConsoleLogger.Error().
+					zerolog.DefaultLogger.Error().
 						Any("errors", err).
 						Str("request", string(httpRequest)).
 						Send()
