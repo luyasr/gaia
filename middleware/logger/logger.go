@@ -12,7 +12,7 @@ func GinLogger() gin.HandlerFunc {
 		c.Next()
 		cost := time.Since(start)
 
-		logEvent := zerolog.ConsoleLogger.Info().
+		logEvent := zerolog.DefaultLogger.Info().
 			Int("status", c.Writer.Status()).
 			Str("method", c.Request.Method).
 			Str("path", c.Request.URL.Path).

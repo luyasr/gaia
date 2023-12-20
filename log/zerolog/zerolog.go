@@ -16,6 +16,11 @@ import (
 
 var _ log.Logger = (*Logger)(nil)
 
+// DefaultLogger default console logger
+var (
+	DefaultLogger = zerolog.New(console()).With().Timestamp().Logger()
+)
+
 type Logger struct {
 	log zerolog.Logger
 }
