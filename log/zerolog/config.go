@@ -6,8 +6,8 @@ import (
 )
 
 // Mode defines the log cutting mode.
-// 1: size
-// 2: time
+// 0: size
+// 1: time
 type Mode int
 
 const (
@@ -17,10 +17,10 @@ const (
 
 // Config defines the configuration for the logger.
 type Config struct {
-	Mode         Mode   `default:"1"` // log cutting mode 1: size 2: time
+	Mode         Mode
 	Filepath     string `default:"."`
 	Filename     string `default:"app.log"`
-	MaxSize      int    `default:"10"`
+	MaxSize      int    `default:"100"`
 	MaxBackups   int    `default:"5"`
 	MaxAge       int    `default:"30"`
 	Compress     bool   `default:"false"`

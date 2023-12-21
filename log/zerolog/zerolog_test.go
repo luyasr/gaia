@@ -19,5 +19,7 @@ func TestNew(t *testing.T) {
 	filterHelper.Error("hello world")
 	filterHelper.Infow("password", "12345")
 
-	New(NewFileLogger(Config{Filename: "acc.log"}))
+	fileLogger := New(NewFileLogger(Config{Mode: ModeSize}))
+	fileHelper := log.NewHelper(fileLogger)
+	fileHelper.Debug("hello world")
 }

@@ -51,13 +51,13 @@ func console() zerolog.ConsoleWriter {
 
 // rotate the log by size or time
 func rotate(config Config) io.Writer {
-	var rl io.Writer
+	var writer io.Writer
 	var err error
-
+	fmt.Println(config)
 	file := path.Join(config.Filepath, config.Filename)
 	switch config.Mode {
 	case ModeSize:
-		rl = &lumberjack.Logger{
+		writer = &lumberjack.Logger{
 			Filename:   file,
 			MaxSize:    config.MaxSize,
 			MaxBackups: config.MaxBackups,
@@ -65,8 +65,8 @@ func rotate(config Config) io.Writer {
 			Compress:   config.Compress,
 		}
 	case ModeTime:
-		rl, err = rotatelogs.New(
-			file+".%Y%m%d%H%M",
+		writer, err = rotatelogs.New(
+			file+".%Y-%m-%d_%H",
 			rotatelogs.WithLinkName(file),
 			rotatelogs.WithMaxAge(time.Duration(config.MaxAgeDay)*24*time.Hour),
 			rotatelogs.WithRotationTime(time.Duration(config.RotationTime)*time.Hour),
@@ -77,7 +77,7 @@ func rotate(config Config) io.Writer {
 		}
 	}
 
-	return rl
+	return writer
 }
 
 func (l *Logger) Log(level log.Level, args ...any) {
