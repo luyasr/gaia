@@ -38,21 +38,32 @@ func WithSprintf(sprintf func(format string, a ...any) string) Option {
 
 // NewHelper creates a new Helper.
 func NewHelper(logger Logger, opt ...Option) *Helper {
-	options := &Helper{
-		logger:  logger,
-		msgKey:  DefaultMessageKey,
-		sprint:  fmt.Sprint,
-		sprintf: fmt.Sprintf,
+	helper := &Helper{
+		logger: logger,
+		msgKey: DefaultMessageKey,
 	}
 
 	for _, o := range opt {
-		o(options)
+		o(helper)
 	}
 
-	return options
+	if helper.sprint == nil {
+		helper.sprint = fmt.Sprint
+	}
+
+	if helper.sprintf == nil {
+		helper.sprintf = fmt.Sprintf
+	}
+
+	return helper
 }
 
 func (h *Helper) Log(level Level, a ...any) {
+	if level < LevelDebug || level > LevelFatal {
+		h.logger.Log(LevelError, h.msgKey, "Invalid log level")
+		return
+	}
+
 	h.logger.Log(level, a...)
 }
 

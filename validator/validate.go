@@ -17,6 +17,10 @@ var (
 )
 
 func init() {
+	setupValidator()
+}
+
+func setupValidator() {
 	validate = validator.New()
 	// english translator
 	enTranslator := en.New()

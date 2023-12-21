@@ -11,6 +11,7 @@ func TestStruct(t *testing.T) {
 	p := Person{}
 	err := Struct(p)
 	if err != nil {
-		t.Log(err)
+		t.Fatal(err)
 	}
+	t.Log(p)
 }

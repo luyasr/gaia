@@ -14,7 +14,7 @@ type loggerAppliance struct {
 }
 
 func init() {
-	global.SetLogger(defaultLogger)
+	global.SetLogger(getDefaultLogger())
 }
 
 func (a *loggerAppliance) SetLogger(logger Logger) {

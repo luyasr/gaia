@@ -35,7 +35,7 @@ func NewSlog(logger *slog.Logger, opts ...SlogOption) *Slog {
 
 func HandlerOptions() *slog.HandlerOptions {
 	return &slog.HandlerOptions{
-		Level: SlogLevelDebug,
+		Level: LevelToSlog[LevelDebug],
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
 			if a.Key == slog.TimeKey {
 				a.Value = slog.StringValue(a.Value.Time().Format(time.DateTime))
@@ -43,7 +43,7 @@ func HandlerOptions() *slog.HandlerOptions {
 
 			if a.Key == slog.LevelKey {
 				level := a.Value.Any().(slog.Level)
-				levelLabel, exists := SlogLevels[level]
+				levelLabel, exists := SlogLevelToString[level]
 				if !exists {
 					levelLabel = level.String()
 				}
@@ -68,16 +68,28 @@ func caller(depth int) string {
 }
 
 func (s *Slog) Log(level Level, args ...any) {
+	if len(args) == 0 {
+		return
+	}
+
+	msg, ok := args[0].(string)
+	if !ok {
+		s.logger.Error("First argument to Log must be a string")
+		return
+	}
+
+	args = args[1:]
+
 	switch level {
 	case LevelDebug:
-		s.logger.With("caller", caller(defaultSlogCaller)).Debug(args[0].(string), args[1:]...)
+		s.logger.With("caller", caller(defaultSlogCaller)).Debug(msg, args...)
 	case LevelInfo:
-		s.logger.With("caller", caller(defaultSlogCaller)).Info(args[0].(string), args[1:]...)
+		s.logger.With("caller", caller(defaultSlogCaller)).Info(msg, args...)
 	case LevelWarn:
-		s.logger.With("caller", caller(defaultSlogCaller)).Warn(args[0].(string), args[1:]...)
+		s.logger.With("caller", caller(defaultSlogCaller)).Warn(msg, args...)
 	case LevelError:
-		s.logger.With("caller", caller(defaultSlogCaller)).Error(args[0].(string), args[1:]...)
+		s.logger.With("caller", caller(defaultSlogCaller)).Error(msg, args...)
 	case LevelFatal:
-		s.logger.With("caller", caller(defaultSlogCaller)).Log(context.Background(), SlogLevelFatal, args[0].(string), args[1:]...)
+		s.logger.With("caller", caller(defaultSlogCaller)).Log(context.Background(), LevelToSlog[LevelFatal], msg, args...)
 	}
 }

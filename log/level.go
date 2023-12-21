@@ -12,18 +12,18 @@ const (
 	LevelFatal
 )
 
-const (
-	SlogLevelDebug = slog.Level(-4)
-	SlogLevelInfo  = slog.Level(0)
-	SlogLevelWarn  = slog.Level(4)
-	SlogLevelError = slog.Level(8)
-	SlogLevelFatal = slog.Level(12)
-)
+var LevelToSlog = map[Level]slog.Level{
+	LevelDebug: slog.Level(-4),
+	LevelInfo:  slog.Level(0),
+	LevelWarn:  slog.Level(4),
+	LevelError: slog.Level(8),
+	LevelFatal: slog.Level(12),
+}
 
-var SlogLevels = map[slog.Leveler]string{
-	SlogLevelDebug: "DEBUG",
-	SlogLevelInfo:  "INFO",
-	SlogLevelWarn:  "WARN",
-	SlogLevelError: "ERROR",
-	SlogLevelFatal: "FATAL",
+var SlogLevelToString = map[slog.Leveler]string{
+	slog.Level(-4): "DEBUG",
+	slog.Level(0):  "INFO",
+	slog.Level(4):  "WARN",
+	slog.Level(8):  "ERROR",
+	slog.Level(12): "FATAL",
 }
