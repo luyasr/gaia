@@ -4,6 +4,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/log"
+	"github.com/luyasr/gaia/reflection"
 	"github.com/spf13/viper"
 	"path/filepath"
 	"strings"
@@ -17,17 +18,20 @@ type Config interface {
 type config struct {
 	// filepath is the path of the config file.
 	filepath string
-	// cfg is the config object.
-	cfg any
+	// target object to unmarshal the config into.
+	target any
 }
 
 type Option func(*config)
 
 // LoadFile loads the config from the given path.
-func LoadFile(filepath string, cfgObj any) Option {
+func LoadFile(filepath string, configObject any) Option {
+	// use reflection to set tag
+	reflection.SetUp(configObject)
+
 	return func(c *config) {
 		c.filepath = filepath
-		c.cfg = cfgObj
+		c.target = configObject
 	}
 }
 
@@ -56,7 +60,7 @@ func (c *config) Read() *config {
 		handleError(err, "read conf failed")
 	}
 
-	if err := viper.Unmarshal(&c.cfg); err != nil {
+	if err := viper.Unmarshal(&c.target); err != nil {
 		handleError(err, "unmarshal conf failed")
 	}
 
@@ -67,7 +71,7 @@ func (c *config) Read() *config {
 func (c *config) Watch() {
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		log.Infof("Config file changed: %s", e.Name)
-		if err := viper.Unmarshal(&c.cfg); err != nil {
+		if err := viper.Unmarshal(&c.target); err != nil {
 			handleError(err, "unmarshal conf failed")
 		}
 	})
