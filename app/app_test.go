@@ -1,4 +1,4 @@
-package gaia
+package app
 
 import (
 	"github.com/luyasr/gaia/transport/grpc"
