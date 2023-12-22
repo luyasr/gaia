@@ -11,7 +11,7 @@ type Server interface {
 }
 
 func IsValidAddress(address string) bool {
-	_, _, err := net.SplitHostPort(address)
+	_, port, err := net.SplitHostPort(address)
 
-	return err == nil
+	return err == nil && port != "0"
 }
