@@ -2,10 +2,11 @@ package http
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/luyasr/gaia/log"
 	"github.com/luyasr/gaia/log/zerolog"
 	"github.com/luyasr/gaia/transport"
-	"net/http"
 )
 
 var _ transport.Server = (*Server)(nil)
@@ -58,7 +59,7 @@ func (s *Server) Run() error {
 		s.log.Warnf("http server address %s is invalid, use default address %s", s.server.Addr, defaultAddress)
 		s.server.Addr = defaultAddress
 	}
-	
+
 	s.log.Infof("http server listen on %s", s.server.Addr)
 	return s.server.ListenAndServe()
 }

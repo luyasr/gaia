@@ -30,8 +30,8 @@ func Address(address string) ServerOption {
 
 func NewServer(opt ...ServerOption) *Server {
 	svc := &Server{
-		server: &grpc.Server{},
-		log:    log.NewHelper(zerolog.New(zerolog.NewConsoleLogger())),
+		server: grpc.NewServer(),
+		log:    log.NewHelper(zerolog.New(zerolog.DefaultLogger)),
 	}
 
 	for _, o := range opt {
@@ -56,7 +56,7 @@ func (s *Server) Run() error {
 	return s.server.Serve(listen)
 }
 
-func (s *Server) Shutdown(context.Context) error {
+func (s *Server) Shutdown(ctx context.Context) error {
 	s.log.Info("grpc server shutdown...")
 	s.server.GracefulStop()
 
