@@ -6,7 +6,7 @@ type Container struct {
 	store map[string]Object
 }
 
-func (c *Container) Load() error {
+func (c *Container) Init() error {
 	for _, obj := range c.store {
 		obj := obj
 		if err := obj.Init(); err != nil {
