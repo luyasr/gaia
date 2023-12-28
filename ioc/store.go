@@ -8,7 +8,6 @@ type Container struct {
 
 func (c *Container) Init() error {
 	for _, obj := range c.store {
-		obj := obj
 		if err := obj.Init(); err != nil {
 			return err
 		}
