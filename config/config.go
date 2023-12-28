@@ -1,13 +1,14 @@
 package config
 
 import (
+	"path/filepath"
+	"strings"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/log"
 	"github.com/luyasr/gaia/reflection"
 	"github.com/spf13/viper"
-	"path/filepath"
-	"strings"
 )
 
 type Config interface {
