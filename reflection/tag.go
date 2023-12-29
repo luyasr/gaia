@@ -1,6 +1,7 @@
 package reflection
 
 import (
+	"github.com/luyasr/gaia/log"
 	"reflect"
 	"strconv"
 )
@@ -29,6 +30,8 @@ func SetDefaultTag(obj any) {
 				vFiled.SetBool(parseBool)
 			case reflect.Struct:
 				SetDefaultTag(vFiled.Addr().Interface())
+			default:
+				log.Errorf("unsupported type: %s", vFiled.Kind())
 			}
 		}
 	}
