@@ -17,9 +17,9 @@ import (
 
 type App struct {
 	servers         []transport.Server
+	ctx             context.Context
 	shutdownTimeout time.Duration
 	sigs            []os.Signal
-	ctx             context.Context
 	log             *log.Helper
 }
 
@@ -49,9 +49,9 @@ func Signal(sigs []os.Signal) Option {
 
 func New(opt ...Option) *App {
 	app := &App{
+		ctx:             context.Background(),
 		shutdownTimeout: 10 * time.Second,
 		sigs:            []os.Signal{os.Interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT},
-		ctx:             context.Background(),
 		log:             log.NewHelper(zerolog.New(zerolog.DefaultLogger)),
 	}
 
