@@ -7,7 +7,10 @@ option go_package = "github.com/luyasr/gaia/errors";
 message Status {
   // @gotags: validate:"omitempty"
   int32 code = 1;
+  // @gotags: validate:"omitempty"
   string reason = 2;
+  // @gotags: validate:"omitempty"
   string message = 3;
+  // @gotags: validate:"omitempty"
   map<string, string> metadata = 4;
 }
