@@ -26,10 +26,13 @@ type Status struct {
 	unknownFields protoimpl.UnknownFields
 
 	// @gotags: validate:"omitempty"
-	Code     int32             `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty" validate:"omitempty"`
-	Reason   string            `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
-	Message  string            `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
-	Metadata map[string]string `protobuf:"bytes,4,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Code int32 `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty" validate:"omitempty"`
+	// @gotags: validate:"omitempty"
+	Reason string `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty" validate:"omitempty"`
+	// @gotags: validate:"omitempty"
+	Message string `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty" validate:"omitempty"`
+	// @gotags: validate:"omitempty"
+	Metadata map[string]string `protobuf:"bytes,4,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"omitempty"`
 }
 
 func (x *Status) Reset() {
