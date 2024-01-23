@@ -53,7 +53,6 @@ func console() zerolog.ConsoleWriter {
 func rotate(config Config) io.Writer {
 	var writer io.Writer
 	var err error
-	fmt.Println(config)
 	file := path.Join(config.Filepath, config.Filename)
 	switch config.Mode {
 	case ModeSize:
