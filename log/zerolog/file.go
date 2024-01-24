@@ -6,8 +6,11 @@ import (
 )
 
 // NewFileLogger creates a new logger with FileWriter
-func NewFileLogger(config Config) zerolog.Logger {
-	writer := rotate(getDefaultConfig(config))
+func NewFileLogger(c Config) (zerolog.Logger, error) {
+	if err := c.initConfig(); err != nil {
+		return zerolog.Logger{}, err
+	}
+	writer := rotate(c)
 
-	return zerolog.New(writer).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger()
+	return zerolog.New(writer).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger(), nil
 }

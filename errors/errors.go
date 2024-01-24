@@ -51,18 +51,7 @@ func (e *Error) Is(err error) bool {
 }
 
 // New returns an error representing c, r, and m.
-func New(code int, reason, message string) *Error {
-	return &Error{
-		Status: Status{
-			Code:    int32(code),
-			Reason:  reason,
-			Message: message,
-		},
-	}
-}
-
-// Errorf returns an error representing c, r, and a formatted message.
-func Errorf(code int, reason, format string, args ...any) *Error {
+func New(code int, reason, format string, args ...any) *Error {
 	return &Error{
 		Status: Status{
 			Code:    int32(code),

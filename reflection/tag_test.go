@@ -15,7 +15,10 @@ func TestSetDefaultTag(t *testing.T) {
 		}
 	}
 
-	p := Person{Name: "tom", Age: 20}
+	p := Person{
+		Name: "tom",
+	 	Age: 20,
+	}
 	SetUp(&p)
 	fmt.Println(p)
 }

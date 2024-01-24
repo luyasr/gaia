@@ -2,6 +2,8 @@ package redis
 
 import (
 	"fmt"
+
+	"github.com/luyasr/gaia/reflection"
 )
 
 type Config struct {
@@ -13,6 +15,16 @@ type Config struct {
 	PoolSize int    `json:"pool_size"`
 }
 
-func (c *Config) Address() string {
+// address returns the address of the redis server
+func (c *Config) address() string {
 	return fmt.Sprintf("%s:%d", c.Host, c.Port)
+}
+
+// initConfig initializes the config with default values
+func (c *Config) initConfig() error {
+	if err := reflection.SetUp(c); err != nil {
+		return err
+	}
+
+	return nil
 }

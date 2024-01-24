@@ -15,7 +15,10 @@ type Http struct {
 
 func TestConfig_Load(t *testing.T) {
 	c := new(conf)
-	cf := New(LoadFile("config.yaml", c))
-	cf.Read().Watch()
+	cf, err := New(LoadFile("config.yaml", c)).Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+	cf.Watch()
 	t.Log(c)
 }

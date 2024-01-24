@@ -19,7 +19,8 @@ func TestNew(t *testing.T) {
 	filterHelper.Error("hello world")
 	filterHelper.Infow("password", "12345")
 
-	fileLogger := New(NewFileLogger(Config{Mode: ModeSize}))
+	l, _ := NewFileLogger(Config{Mode: ModeSize})
+	fileLogger := New(l)
 	fileHelper := log.NewHelper(fileLogger)
 	fileHelper.Debug("hello world")
 }

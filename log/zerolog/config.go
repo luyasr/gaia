@@ -1,7 +1,6 @@
 package zerolog
 
 import (
-	"dario.cat/mergo"
 	"github.com/luyasr/gaia/reflection"
 )
 
@@ -28,12 +27,10 @@ type Config struct {
 	RotationTime int    `default:"1"`
 }
 
-func getDefaultConfig(config Config) Config {
-	var defaultConfig Config
-	// use reflection to set tag
-	reflection.SetUp(&defaultConfig)
-	// merge the default configuration with the configuration passed in
-	_ = mergo.Merge(&defaultConfig, config, mergo.WithOverride)
+func (c *Config) initConfig() error {
+	if err := reflection.SetUp(c); err != nil {
+		return err
+	}
 
-	return defaultConfig
+	return nil
 }

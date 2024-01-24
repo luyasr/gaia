@@ -1,13 +1,17 @@
 package reflection
 
 import (
-	"github.com/luyasr/gaia/log"
 	"reflect"
 	"strconv"
+
+	"github.com/luyasr/gaia/errors"
 )
 
-func SetDefaultTag(obj any) {
-	typeOf, valueOf := Must(obj)
+func SetDefaultTag(obj any) error {
+	typeOf, valueOf, err := Must(obj)
+	if err != nil {
+		return err
+	}
 
 	for i := 0; i < typeOf.NumField(); i++ {
 		tFiled, vFiled := typeOf.Field(i), valueOf.Field(i)
@@ -28,11 +32,15 @@ func SetDefaultTag(obj any) {
 			case reflect.Bool:
 				parseBool, _ := strconv.ParseBool(tag)
 				vFiled.SetBool(parseBool)
+			case reflect.Ptr:
+				vFiled.Set(reflect.New(vFiled.Type().Elem()))
 			case reflect.Struct:
 				SetDefaultTag(vFiled.Addr().Interface())
 			default:
-				log.Errorf("unsupported type: %s", vFiled.Kind())
+				return errors.Internal("reflection setting default failed", "unsupported type: %s", vFiled.Kind())
 			}
 		}
 	}
+
+	return nil
 }

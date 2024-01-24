@@ -6,9 +6,12 @@ import (
 )
 
 // NewMultiLogger creates a new logger with MultiLevelWriter
-func NewMultiLogger(config Config) zerolog.Logger {
-	writer := rotate(getDefaultConfig(config))
+func NewMultiLogger(c Config) (zerolog.Logger, error) {
+	if err := c.initConfig(); err != nil {
+		return zerolog.Logger{}, err
+	}
+	writer := rotate(c)
 	multi := zerolog.MultiLevelWriter(console(), writer)
 
-	return zerolog.New(multi).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger()
+	return zerolog.New(multi).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger(), nil
 }
