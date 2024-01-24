@@ -23,21 +23,21 @@ func NewMysql(c Config, opts ...Option) (*Mysql, error) {
 		return nil, err
 	}
 
-	m, err := newMysql(c)
-	if err != nil {
-		return nil, err
-	}
+	m := &Mysql{}
 
 	for _, opt := range opts {
 		opt(m)
 	}
 
+	m, err = newMysql(c, m)
+	if err != nil {
+		return nil, err
+	}
+
 	return m, nil
 }
 
-func newMysql(c Config) (*Mysql, error) {
-	m := &Mysql{}
-
+func newMysql(c Config, m *Mysql) (*Mysql, error) {
 	var err error
 	once.Do(func() {
 		m.Client, err = gorm.Open(mysql.Open(c.dsn()), &gorm.Config{

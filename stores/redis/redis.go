@@ -26,21 +26,21 @@ func NewRedis(c Config, opts ...Option) (*Redis, error) {
 		c.PoolSize = 10 * runtime.GOMAXPROCS(0)
 	}
 
-	r, err := newRedis(c)
-	if err != nil {
-		return nil, err
-	}
+	r := &Redis{}
 
 	for _, opt := range opts {
 		opt(r)
 	}
 
+	r, err = newRedis(c, r)
+	if err != nil {
+		return nil, err
+	}
+
 	return r, nil
 }
 
-func newRedis(c Config) (*Redis, error) {
-	r := &Redis{}
-
+func newRedis(c Config, r *Redis) (*Redis, error) {
 	var err error
 	once.Do(func() {
 		r.Client = redis.NewClient(&redis.Options{
