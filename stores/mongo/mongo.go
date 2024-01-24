@@ -46,11 +46,7 @@ func newMongo(c Config, m *Mongo) (*Mongo, error) {
 	once.Do(func() {
 		m.Client, err = mongo.Connect(context.TODO(), opts)
 
-		defer func() {
-			m.Client.Disconnect(context.TODO())
-		}()
-
-		err = m.Ping()
+		err = m.ping()
 	})
 	if err != nil {
 		return nil, err
@@ -59,7 +55,15 @@ func newMongo(c Config, m *Mongo) (*Mongo, error) {
 	return m, nil
 }
 
-func (m *Mongo) Ping() error {
+func (m *Mongo) Close() error {
+	if m.Client != nil {
+		return m.Client.Disconnect(context.TODO())
+	}
+
+	return nil
+}
+
+func (m *Mongo) ping() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
