@@ -21,6 +21,7 @@ type Interface interface {
 type Config struct {
 	filepath string
 	target   any
+	parsedPath
 }
 
 // parsedPath represents a parsed file path with directory, filename and extension.
@@ -37,6 +38,7 @@ func LoadFile(filepath string, configObject any) Option {
 	return func(c *Config) {
 		c.filepath = filepath
 		c.target = configObject
+		c.parsedPath = pathParse(filepath)
 	}
 }
 
@@ -58,15 +60,18 @@ func (c *Config) initConfig() error {
 		return err
 	}
 
-	p := pathParse(c.filepath)
-	viper.AddConfigPath(p.dir)
-	viper.SetConfigName(p.filename)
-	viper.SetConfigType(p.extension)
+	c.configureViper()
+
+	return nil
+}
+
+func (c *Config) configureViper() {
+	viper.AddConfigPath(c.dir)
+	viper.SetConfigName(c.filename)
+	viper.SetConfigType(c.extension)
 	viper.AutomaticEnv()
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)
-
-	return nil
 }
 
 // Read reads the config from the file and unmarshals it into the target object.

@@ -1,7 +1,6 @@
 package zerolog
 
 import (
-	"github.com/luyasr/gaia/log"
 	"github.com/rs/zerolog"
 )
 
@@ -13,5 +12,5 @@ func NewMultiLogger(c Config) (zerolog.Logger, error) {
 	writer := rotate(c)
 	multi := zerolog.MultiLevelWriter(console(), writer)
 
-	return zerolog.New(multi).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger(), nil
+	return zerolog.New(multi).With().Timestamp().CallerWithSkipFrameCount(CallerDepth).Logger(), nil
 }

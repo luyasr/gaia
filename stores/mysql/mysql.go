@@ -17,7 +17,7 @@ type Mysql struct {
 
 type Option func(*Mysql)
 
-func NewMysql(c Config, opts ...Option) (*Mysql, error) {
+func New(c Config, opts ...Option) (*Mysql, error) {
 	err := c.initConfig()
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func NewMysql(c Config, opts ...Option) (*Mysql, error) {
 		opt(m)
 	}
 
-	m, err = newMysql(c, m)
+	m, err = new(c, m)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func NewMysql(c Config, opts ...Option) (*Mysql, error) {
 	return m, nil
 }
 
-func newMysql(c Config, m *Mysql) (*Mysql, error) {
+func new(c Config, m *Mysql) (*Mysql, error) {
 	var err error
 	once.Do(func() {
 		m.Client, err = gorm.Open(mysql.Open(c.dsn()), &gorm.Config{

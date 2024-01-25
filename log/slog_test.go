@@ -19,6 +19,7 @@ func TestNewSlog(t *testing.T) {
 	Info("msg", "user", user)
 
 	Debug("", "user", "user")
+	Debugw("", "user", user)
 	Debugf("%v", user)
 	Info("2")
 	Warn("3", "username", "lisi")

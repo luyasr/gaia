@@ -9,11 +9,11 @@ import (
 	"time"
 )
 
-const (
-	defaultSlogCaller = 3
-)
-
 var _ Logger = (*Slog)(nil)
+
+const (
+	callerDepth = 4
+)
 
 type Slog struct {
 	logger *slog.Logger
@@ -22,15 +22,15 @@ type Slog struct {
 type SlogOption func(*Slog)
 
 func NewSlog(logger *slog.Logger, opts ...SlogOption) *Slog {
-	options := &Slog{
+	slog := &Slog{
 		logger: logger,
 	}
 
 	for _, opt := range opts {
-		opt(options)
+		opt(slog)
 	}
 
-	return options
+	return slog
 }
 
 func HandlerOptions() *slog.HandlerOptions {
@@ -67,6 +67,21 @@ func caller(depth int) string {
 	return file[idx+1:] + ":" + strconv.Itoa(line)
 }
 
+func (s *Slog) log(level Level, msg string, args ...any) {
+	switch level {
+	case LevelDebug:
+		s.logger.With("caller", caller(callerDepth)).Debug(msg, args...)
+	case LevelInfo:
+		s.logger.With("caller", caller(callerDepth)).Info(msg, args...)
+	case LevelWarn:
+		s.logger.With("caller", caller(callerDepth)).Warn(msg, args...)
+	case LevelError:
+		s.logger.With("caller", caller(callerDepth)).Error(msg, args...)
+	case LevelFatal:
+		s.logger.With("caller", caller(callerDepth)).Log(context.Background(), LevelToSlog[LevelFatal], msg, args...)
+	}
+}
+
 func (s *Slog) Log(level Level, args ...any) {
 	if len(args) == 0 {
 		return
@@ -79,17 +94,5 @@ func (s *Slog) Log(level Level, args ...any) {
 	}
 
 	args = args[1:]
-
-	switch level {
-	case LevelDebug:
-		s.logger.With("caller", caller(defaultSlogCaller)).Debug(msg, args...)
-	case LevelInfo:
-		s.logger.With("caller", caller(defaultSlogCaller)).Info(msg, args...)
-	case LevelWarn:
-		s.logger.With("caller", caller(defaultSlogCaller)).Warn(msg, args...)
-	case LevelError:
-		s.logger.With("caller", caller(defaultSlogCaller)).Error(msg, args...)
-	case LevelFatal:
-		s.logger.With("caller", caller(defaultSlogCaller)).Log(context.Background(), LevelToSlog[LevelFatal], msg, args...)
-	}
+	s.log(level, msg, args...)
 }

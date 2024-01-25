@@ -10,7 +10,7 @@ func TestNewRedis(t *testing.T) {
 		Password: "12345678",
 	}
 
-	r, err := NewRedis(config)
+	r, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}

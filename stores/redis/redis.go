@@ -16,7 +16,7 @@ type Redis struct {
 
 type Option func(*Redis)
 
-func NewRedis(c Config, opts ...Option) (*Redis, error) {
+func New(c Config, opts ...Option) (*Redis, error) {
 	err := c.initConfig()
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func NewRedis(c Config, opts ...Option) (*Redis, error) {
 		opt(r)
 	}
 
-	r, err = newRedis(c, r)
+	r, err = new(c, r)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func NewRedis(c Config, opts ...Option) (*Redis, error) {
 	return r, nil
 }
 
-func newRedis(c Config, r *Redis) (*Redis, error) {
+func new(c Config, r *Redis) (*Redis, error) {
 	var err error
 	once.Do(func() {
 		r.Client = redis.NewClient(&redis.Options{

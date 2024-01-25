@@ -1,7 +1,6 @@
 package zerolog
 
 import (
-	"github.com/luyasr/gaia/log"
 	"github.com/rs/zerolog"
 )
 
@@ -12,5 +11,5 @@ func NewFileLogger(c Config) (zerolog.Logger, error) {
 	}
 	writer := rotate(c)
 
-	return zerolog.New(writer).With().Timestamp().CallerWithSkipFrameCount(log.DefaultCaller).Logger(), nil
+	return zerolog.New(writer).With().Timestamp().CallerWithSkipFrameCount(CallerDepth).Logger(), nil
 }

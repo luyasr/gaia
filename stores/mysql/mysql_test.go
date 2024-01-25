@@ -17,7 +17,7 @@ func TestNewMysql(t *testing.T) {
 	}
 
 	// 调用 NewMysql 函数
-	m, err := NewMysql(c)
+	m, err := New(c)
 	if err != nil {
 		t.Fatal(err)
 	}

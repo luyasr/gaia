@@ -1,14 +1,16 @@
-package middleware
+package recovery
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/luyasr/gaia/log/zerolog"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"os"
 	"runtime/debug"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/luyasr/gaia/log"
+	"github.com/luyasr/gaia/log/zerolog"
 )
 
 var (
@@ -16,20 +18,44 @@ var (
 	lastErrorLower string
 )
 
-func GinRecovery(stack bool) gin.HandlerFunc {
+type Recovery struct {
+	logger *log.Helper
+}
+
+type Option func(*Recovery)
+
+func WithLogger(logger *log.Helper) Option {
+	return func(r *Recovery) {
+		r.logger = logger
+	}
+}
+
+func New(opts ...Option) *Recovery {
+	r := &Recovery{
+		logger: log.NewHelper(zerolog.New(zerolog.DefaultLogger)),
+	}
+
+	for _, opt := range opts {
+		opt(r)
+	}
+
+	return r
+}
+
+func (r *Recovery) GinRecovery(stack bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
+				httpRequest, _ := httputil.DumpRequest(c.Request, false)
 				// Check for a broken connection, as it is not really a
 				// condition that warrants a panic stack trace.
 				brokenPipe := isBrokenPipe(err)
 
-				httpRequest, _ := httputil.DumpRequest(c.Request, false)
 				if brokenPipe {
-					zerolog.DefaultLogger.Error().
-						Any("errors", err).
-						Str("request", string(httpRequest)).
-						Send()
+					r.logger.Errorw(
+						"request", string(httpRequest),
+						"errors", err,
+					)
 					// If the connection is dead, we can't write a status to it.
 					_ = c.Error(err.(error)) // nolint: err check
 					c.Abort()
@@ -37,16 +63,16 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 				}
 
 				if stack {
-					zerolog.DefaultLogger.Error().
-						Any("errors", err).
-						Str("request", string(httpRequest)).
-						Str("stack", string(debug.Stack())).
-						Send()
+					r.logger.Errorw(
+						"request", string(httpRequest),
+						"errors", err,
+						"stack", string(debug.Stack()),
+					)
 				} else {
-					zerolog.DefaultLogger.Error().
-						Any("errors", err).
-						Str("request", string(httpRequest)).
-						Send()
+					r.logger.Errorw(
+						"request", string(httpRequest),
+						"errors", err,
+					)
 				}
 				c.AbortWithStatus(http.StatusInternalServerError)
 			}

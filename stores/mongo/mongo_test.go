@@ -9,7 +9,7 @@ func TestNewMongo(t *testing.T) {
 		Username: "root",
 		Password: "12345678",
 	}
-	m, err := NewMongo(c)
+	m, err := New(c)
 	if err != nil {
 		t.Fatal(err)
 	}

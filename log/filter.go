@@ -68,10 +68,11 @@ func (f *Filter) Log(level Level, args ...any) {
 		return
 	}
 
+	argsLen := len(args)
 	if len(f.key) > 0 || len(f.value) > 0 {
-		for i := 0; i < len(args); i += 2 {
+		for i := 0; i < argsLen; i += 2 {
 			v := i + 1
-			if v > len(args) {
+			if v >= argsLen {
 				continue
 			}
 			if _, ok := f.key[args[i]]; ok {

@@ -2,16 +2,22 @@ package zerolog
 
 import (
 	"fmt"
-	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
-	"github.com/luyasr/gaia/log"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/pkgerrors"
-	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/luyasr/gaia/log"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/pkgerrors"
+	"gopkg.in/natefinch/lumberjack.v2"
+)
+
+const (
+	CallerDepth = 4
+	FilterCallerDepth = 5
 )
 
 var _ log.Logger = (*Logger)(nil)
@@ -113,3 +119,5 @@ func (l *Logger) Log(level log.Level, args ...any) {
 
 	event.Send()
 }
+
+

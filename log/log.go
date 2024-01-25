@@ -6,11 +6,6 @@ import (
 	"sync"
 )
 
-const (
-	DefaultCaller       = 4
-	DefaultFilterCaller = 5
-)
-
 // defaultLogger is a singleton instance of Slog.
 var (
 	defaultLogger Logger
