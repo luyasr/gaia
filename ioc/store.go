@@ -21,8 +21,9 @@ func (c *Container) Get(name string) Object {
 }
 
 func (c *Container) Registry(object Object) {
-	if _, exists := c.store[object.Name()]; !exists {
-		c.store[object.Name()] = object
+	name := object.Name()
+	if _, exists := c.store[name]; !exists {
+		c.store[name] = object
 	}
 }
 
