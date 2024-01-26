@@ -24,7 +24,7 @@ type Recovery struct {
 
 type Option func(*Recovery)
 
-func WithLogger(logger *log.Helper) Option {
+func Logger(logger *log.Helper) Option {
 	return func(r *Recovery) {
 		r.logger = logger
 	}

@@ -14,7 +14,7 @@ type Log struct {
 
 type Option func(*Log)
 
-func WithLogger(logger *log.Helper) Option {
+func Logger(logger *log.Helper) Option {
 	return func(l *Log) {
 		l.logger = logger
 	}

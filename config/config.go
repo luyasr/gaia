@@ -13,7 +13,7 @@ import (
 
 // Interface defines the methods that a config should have.
 type Interface interface {
-	Read() (*Config, error)
+	Read() error
 	Watch() error
 }
 
@@ -35,64 +35,67 @@ type Option func(*Config)
 
 // LoadFile creates an Option that loads the config from the given path into the given object.
 func LoadFile(filepath string, configObject any) Option {
-	return func(c *Config) {
-		c.filepath = filepath
-		c.target = configObject
-		c.parsedPath = pathParse(filepath)
+	return func(cfg *Config) {
+		cfg.filepath = filepath
+		cfg.target = configObject
+		cfg.parsedPath = pathParse(filepath)
 	}
 }
 
 // New creates a new config with the given options.
-func New(opts ...Option) *Config {
-	c := &Config{}
+func New(opts ...Option) (*Config, error) {
+	cfg := &Config{}
 
 	for _, opt := range opts {
-		opt(c)
+		opt(cfg)
 	}
 
-	_ = c.initConfig()
+	err := cfg.initConfig()
+	if err != nil {
+		return cfg, err
+	}
 
-	return c
+	return cfg, nil
 }
 
-func (c *Config) initConfig() error {
-	if err := reflection.SetUp(c.target); err != nil {
+func (cfg *Config) initConfig() error {
+	if err := reflection.SetUp(cfg.target); err != nil {
 		return err
 	}
 
-	c.configureViper()
+	cfg.configureViper()
 
 	return nil
 }
 
-func (c *Config) configureViper() {
-	viper.AddConfigPath(c.dir)
-	viper.SetConfigName(c.filename)
-	viper.SetConfigType(c.extension)
+func (cfg *Config) configureViper() {
+	viper.AddConfigPath(cfg.dir)
+	viper.SetConfigName(cfg.filename)
+	viper.SetConfigType(cfg.extension)
 	viper.AutomaticEnv()
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)
 }
 
 // Read reads the config from the file and unmarshals it into the target object.
-func (c *Config) Read() (*Config, error) {
+func (cfg *Config) Read() error {
 	if err := viper.ReadInConfig(); err != nil {
-		return nil, errors.Internal("failed to read config file", err.Error())
+		return errors.Internal("failed to read config file", err.Error())
 	}
 
-	if err := viper.Unmarshal(&c.target); err != nil {
-		return nil, errors.Internal("failed to unmarshal config file", err.Error())
+	if err := viper.Unmarshal(&cfg.target); err != nil {
+		return errors.Internal("failed to unmarshal config file", err.Error())
 	}
 
-	return c, nil
+	return nil
 }
 
 // Watch watches the config file for changes and reloads the config when a change is detected.
-func (c *Config) Watch() error {
+func (cfg *Config) Watch() error {
 	errCh := make(chan error, 1)
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		log.Infof("Config file changed: %s", e.Name)
-		if err := viper.Unmarshal(&c.target); err != nil {
+		if err := viper.Unmarshal(&cfg.target); err != nil {
 			errCh <- err
 		}
 	})

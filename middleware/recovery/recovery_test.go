@@ -20,7 +20,7 @@ func TestGinRecovery(t *testing.T) {
 	logger := log.NewHelper(zerolog.New(zerolog.DefaultLogger))
 
 	// 创建一个新的Recovery实例
-	r := New(WithLogger(logger))
+	r := New(Logger(logger))
 
 	// 添加GinRecovery中间件
 	router.Use(r.GinRecovery(true))

@@ -3,7 +3,7 @@ package ioc
 import "github.com/gin-gonic/gin"
 
 type Container struct {
-	store map[string]Object
+	store map[string]Ioc
 }
 
 func (c *Container) Init() error {
@@ -16,11 +16,11 @@ func (c *Container) Init() error {
 	return nil
 }
 
-func (c *Container) Get(name string) Object {
+func (c *Container) Get(name string) Ioc {
 	return c.store[name]
 }
 
-func (c *Container) Registry(object Object) {
+func (c *Container) Registry(object Ioc) {
 	name := object.Name()
 	if _, exists := c.store[name]; !exists {
 		c.store[name] = object

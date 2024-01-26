@@ -1,38 +1,47 @@
 package reflection
 
-import "reflect"
+import (
+	"reflect"
+)
 
+// StructToMap converts a struct to a map using reflection.
+// If you want to remove default zero values, you can use pointer types in the struct.
 func StructToMap(obj any) map[string]any {
-	return structToMapInternal(obj, false)
-}
-
-func StructToMapRmEmpty(obj any) map[string]any {
-	return structToMapInternal(obj, true)
-}
-
-func structToMapInternal(obj any, removeEmpty bool) map[string]any {
 	valueOf := reflect.ValueOf(obj)
+	typeOf := valueOf.Type()
+	typeOfNumField := typeOf.NumField()
+	resultMap := make(map[string]any, typeOfNumField)
+
+	// If the object is a pointer, dereference it.
 	if valueOf.Kind() == reflect.Ptr {
 		valueOf = valueOf.Elem()
 	}
-	typeOf := valueOf.Type()
 
-	m := make(map[string]any)
-
-	for i := 0; i < typeOf.NumField(); i++ {
+	// Iterate over all fields of the struct.
+	for i := 0; i < typeOfNumField; i++ {
 		tField, vField := typeOf.Field(i), valueOf.Field(i)
-		fieldValue := vField.Interface()
 
-		if removeEmpty && fieldValue == reflect.Zero(vField.Type()).Interface() {
-			continue
+		// If the field is a pointer, dereference it.
+		if vField.Kind() == reflect.Ptr {
+			if vField.IsNil() {
+				continue
+			}
+			vField = vField.Elem()
 		}
 
+		fieldValue := vField.Interface()
+		fieldName := tField.Name
 		if tag, ok := tField.Tag.Lookup("json"); ok {
-			m[tag] = fieldValue
-		} else {
-			m[tField.Name] = fieldValue
+			fieldName = tag
+		}
+
+		switch vField.Kind() {
+		case reflect.Struct:
+			resultMap[fieldName] = StructToMap(fieldValue)
+		default:
+			resultMap[fieldName] = fieldValue
 		}
 	}
 
-	return m
+	return resultMap
 }

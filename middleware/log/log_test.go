@@ -20,7 +20,7 @@ func TestGinLogger(t *testing.T) {
 	logger := log.NewHelper(zerolog.New(zerolog.DefaultLogger))
 
 	// 创建一个新的Log实例
-	l := New(WithLogger(logger))
+	l := New(Logger(logger))
 
 	// 添加GinLogger中间件
 	router.Use(l.GinLogger())

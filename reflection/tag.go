@@ -21,16 +21,28 @@ func SetDefaultTag(obj any) error {
 			case reflect.String:
 				vFiled.SetString(tag)
 			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-				parseInt, _ := strconv.ParseInt(tag, 10, 64)
+				parseInt, err := strconv.ParseInt(tag, 10, 64)
+				if err != nil {
+					return errors.Internal("reflection setting default failed", "error parsing int: %s", err)
+				}
 				vFiled.SetInt(parseInt)
 			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-				parseUint, _ := strconv.ParseUint(tag, 10, 64)
+				parseUint, err := strconv.ParseUint(tag, 10, 64)
+				if err != nil {
+					return errors.Internal("reflection setting default failed", "error parsing uint: %s", err)
+				}
 				vFiled.SetUint(parseUint)
 			case reflect.Float32, reflect.Float64:
-				parseFloat, _ := strconv.ParseFloat(tag, 64)
+				parseFloat, err := strconv.ParseFloat(tag, 64)
+				if err != nil {
+					return errors.Internal("reflection setting default failed", "error parsing float: %s", err)
+				}
 				vFiled.SetFloat(parseFloat)
 			case reflect.Bool:
-				parseBool, _ := strconv.ParseBool(tag)
+				parseBool, err := strconv.ParseBool(tag)
+				if err != nil {
+					return errors.Internal("reflection setting default failed", "error parsing bool: %s", err)
+				}
 				vFiled.SetBool(parseBool)
 			case reflect.Ptr:
 				vFiled.Set(reflect.New(vFiled.Type().Elem()))

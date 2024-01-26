@@ -7,16 +7,24 @@ import (
 func TestStructToMap(t *testing.T) {
 	type testStruct struct {
 		Name string `json:"name"`
-		Age  int
+		Age  *int
+		C struct {
+			Addr string `json:"addr"`
+		}
+		D int `json:"d"`
 	}
 
+	// age := 20
+
 	obj := testStruct{
-		Name: "Luya",
-		// Age:  20,
+		// Name: "Luya",
+		// Age:  &age,
+		// C: struct {
+		// 	Addr string `json:"addr"`
+		// }{Addr: "127.0.0.1:80"},
 	}
 
 	m := StructToMap(obj)
-	rm := StructToMapRmEmpty(obj)
 
-	t.Log(m, rm)
+	t.Log(m)
 }
