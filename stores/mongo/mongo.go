@@ -18,7 +18,7 @@ type Mongo struct {
 
 type Option func(*Mongo)
 
-func New(c Config, opts ...Option) (*Mongo, error) {
+func New(c *Config, opts ...Option) (*Mongo, error) {
 	err := c.initConfig()
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func New(c Config, opts ...Option) (*Mongo, error) {
 	return m, nil
 }
 
-func new(c Config, m *Mongo) (*Mongo, error) {
+func new(c *Config, m *Mongo) (*Mongo, error) {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(c.uri()).SetServerAPIOptions(serverAPI)
 
