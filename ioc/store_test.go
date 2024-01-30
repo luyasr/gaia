@@ -28,4 +28,5 @@ func TestRegistryAndGet(t *testing.T) {
 	IocContainer.Registry("xxxxx", &mockIoc{name: "6"}, 1)
 	IocContainer.Registry("xxxxx", &mockIoc{name: "8"}, 0)
 	IocContainer.Init()
+	IocContainer.Close()
 }

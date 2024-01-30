@@ -11,13 +11,15 @@ import (
 const defaultPriority = 0
 
 type Container struct {
-	store map[string]*ns
+	store  map[string]*ns
+	sorted []*ns
 }
 
 type ns struct {
 	name     string
 	ioc      map[string]*ioc
 	priority int
+	sorted   []*ioc
 }
 
 type ioc struct {
@@ -26,37 +28,47 @@ type ioc struct {
 	priority int
 }
 
-func (c *Container) sort() []*ns {
-	stored := make([]*ns, 0, len(c.store))
+func (c *Container) sort() {
+	c.sorted = make([]*ns, 0, len(c.store))
 	for _, ns := range c.store {
-		stored = append(stored, ns)
+		c.sorted = append(c.sorted, ns)
 	}
 
-	sort.Slice(stored, func(i, j int) bool {
-		return stored[i].priority < stored[j].priority
+	sort.Slice(c.sorted, func(i, j int) bool {
+		return c.sorted[i].priority < c.sorted[j].priority
 	})
-
-	return stored
 }
 
-func (n *ns) sort() []*ioc {
-	sorted := make([]*ioc, 0, len(n.ioc))
+func (c *Container) reverse() {
+	length := len(c.sorted)
+	for i := 0; i < length/2; i++ {
+		c.sorted[i], c.sorted[length-i-1] = c.sorted[length-i-1], c.sorted[i]
+	}
+}
+
+func (n *ns) sort() {
+	n.sorted = make([]*ioc, 0, len(n.ioc))
 	for _, ioc := range n.ioc {
-		sorted = append(sorted, ioc)
+		n.sorted = append(n.sorted, ioc)
 	}
 
-	sort.Slice(sorted, func(i, j int) bool {
-		return sorted[i].priority < sorted[j].priority
+	sort.Slice(n.sorted, func(i, j int) bool {
+		return n.sorted[i].priority < n.sorted[j].priority
 	})
+}
 
-	return sorted
+func (n *ns) reverse() {
+	length := len(n.sorted)
+	for i := 0; i < length/2; i++ {
+		n.sorted[i], n.sorted[length-i-1] = n.sorted[length-i-1], n.sorted[i]
+	}
 }
 
 func (c *Container) Init() error {
-	stored := c.sort()
-	for _, ns := range stored {
-		sorted := ns.sort()
-		for _, ioc := range sorted {
+	c.sort()
+	for _, ns := range c.sorted {
+		ns.sort()
+		for _, ioc := range ns.sorted {
 			err := ioc.object.Init()
 			if err != nil {
 				return err
@@ -80,25 +92,25 @@ func (c *Container) Get(namespace, name string) (Ioc, error) {
 }
 
 func (c *Container) RegistryNamespace(namespace string, priority ...int) {
-	prio := defaultPriority
-	if len(priority) > 0 {
-		prio = priority[0]
-	}
-
 	if _, exists := c.store[namespace]; !exists {
+		prio := defaultPriority
+		if len(priority) > 0 {
+			prio = priority[0]
+		}
+
 		c.store[namespace] = &ns{name: namespace, ioc: map[string]*ioc{}, priority: prio}
 		log.Infof("registry namespace: %s", namespace)
 	}
 }
 
 func (c *Container) Registry(namespace string, object Ioc, priority ...int) {
-	prio := defaultPriority
-	if len(priority) > 0 {
-		prio = priority[0]
-	}
-	objectName := object.Name()
-
 	if ns, exists := c.store[namespace]; exists {
+		prio := defaultPriority
+		if len(priority) > 0 {
+			prio = priority[0]
+		}
+		objectName := object.Name()
+
 		ns.ioc[objectName] = &ioc{name: objectName, object: object, priority: prio}
 		log.Infof("%s registry: %s", namespace, objectName)
 	}
@@ -109,6 +121,21 @@ func (c *Container) GinIRouterRegistry(r gin.IRouter) {
 		if router, ok := ioc.object.(GinIRouter); ok {
 			router.Registry(r)
 			log.Infof("GinIRouterRegistry: %s", ioc.name)
+		}
+	}
+}
+
+// Close will close all the ioc.Closer
+// 倒序关闭所有实现了 ioc.Closer 的对象
+func (c *Container) Close() {
+	c.reverse()
+	for _, ns := range c.sorted {
+		ns.reverse()
+		for _, ioc := range ns.sorted {
+			if closer, ok := ioc.object.(Closer); ok {
+				closer.Close()
+				log.Infof("%s close: %s", ns.name, ioc.name)
+			}
 		}
 	}
 }
