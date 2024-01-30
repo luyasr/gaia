@@ -88,7 +88,7 @@ func (c *Container) Get(namespace, name string) (Ioc, error) {
 		return nil, errors.NotFound("ioc not found", "namespace: %s, name: %s", namespace, name)
 	}
 
-	return nil, errors.NotFound("namespace not found", "namespace: %s", namespace)
+	return nil, errors.NotFound("namespace not found", "namespace: %s, name: %s", namespace, name)
 }
 
 func (c *Container) RegistryNamespace(namespace string, priority ...int) {
