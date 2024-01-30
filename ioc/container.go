@@ -1,5 +1,10 @@
 package ioc
 
+import (
+	"github.com/luyasr/gaia/log"
+	"github.com/luyasr/gaia/log/zerolog"
+)
+
 const (
 	ConfigNamespace     = "config"
 	DbNamespace         = "db"
@@ -9,7 +14,7 @@ const (
 )
 
 var (
-	IocContainer = &Container{
+	Container = &container{
 		store: map[string]*ns{
 			ConfigNamespace:     {name: ConfigNamespace, ioc: map[string]*ioc{}, priority: -9},
 			DbNamespace:         {name: DbNamespace, ioc: map[string]*ioc{}, priority: -8},
@@ -19,3 +24,7 @@ var (
 		},
 	}
 )
+
+func init() {
+	Container.SetLogger(log.NewHelper(zerolog.New(zerolog.DefaultLogger)))
+}

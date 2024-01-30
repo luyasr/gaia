@@ -21,16 +21,16 @@ func (m *mockIoc) Close() error {
 }
 
 func TestRegistryAndGet(t *testing.T) {
-	IocContainer.Registry(DbNamespace, &mockIoc{name: "1"})
-	IocContainer.Registry(ConfigNamespace, &mockIoc{name: "2"})
-	IocContainer.Registry(ConfigNamespace, &mockIoc{name: "3"})
-	IocContainer.Registry(ControllerNamespace, &mockIoc{name: "4"})
-	IocContainer.Registry(RouterNamespace, &mockIoc{name: "5"})
-	IocContainer.RegistryNamespace("xxxxx")
-	IocContainer.Registry("xxxxx", &mockIoc{name: "8"}, 3)
-	IocContainer.Registry("xxxxx", &mockIoc{name: "10"}, 4)
-	IocContainer.Registry("xxxxx", &mockIoc{name: "12"}, 1)
-	IocContainer.Registry("xxxxx", &mockIoc{name: "14"}, 0)
-	IocContainer.Init()
-	IocContainer.Close()
+	Container.Registry(DbNamespace, &mockIoc{name: "1"})
+	Container.Registry(ConfigNamespace, &mockIoc{name: "2"})
+	Container.Registry(ConfigNamespace, &mockIoc{name: "3"})
+	Container.Registry(ControllerNamespace, &mockIoc{name: "4"})
+	Container.Registry(RouterNamespace, &mockIoc{name: "5"})
+	Container.RegistryNamespace("xxxxx")
+	Container.Registry("xxxxx", &mockIoc{name: "8"}, 3)
+	Container.Registry("xxxxx", &mockIoc{name: "10"}, 4)
+	Container.Registry("xxxxx", &mockIoc{name: "12"}, 1)
+	Container.Registry("xxxxx", &mockIoc{name: "14"}, 0)
+	Container.Init()
+	Container.Close()
 }

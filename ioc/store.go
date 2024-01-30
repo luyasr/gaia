@@ -10,9 +10,10 @@ import (
 
 const defaultPriority = 0
 
-type Container struct {
+type container struct {
 	store  map[string]*ns
 	sorted []*ns
+	log    *log.Helper
 }
 
 type ns struct {
@@ -28,7 +29,11 @@ type ioc struct {
 	priority int
 }
 
-func (c *Container) sort() {
+func (c *container) SetLogger(l *log.Helper) {
+	c.log = l
+}
+
+func (c *container) sort() {
 	c.sorted = make([]*ns, 0, len(c.store))
 	for _, ns := range c.store {
 		c.sorted = append(c.sorted, ns)
@@ -39,7 +44,7 @@ func (c *Container) sort() {
 	})
 }
 
-func (c *Container) reverse() {
+func (c *container) reverse() {
 	length := len(c.sorted)
 	for i := 0; i < length/2; i++ {
 		c.sorted[i], c.sorted[length-i-1] = c.sorted[length-i-1], c.sorted[i]
@@ -64,7 +69,7 @@ func (n *ns) reverse() {
 	}
 }
 
-func (c *Container) Init() error {
+func (c *container) Init() error {
 	c.sort()
 	for _, ns := range c.sorted {
 		ns.sort()
@@ -73,14 +78,14 @@ func (c *Container) Init() error {
 			if err != nil {
 				return err
 			}
-			log.Infof("%s init: %s", ns.name, ioc.name)
+			c.log.Infof("%s init: %s", ns.name, ioc.name)
 		}
 	}
 
 	return nil
 }
 
-func (c *Container) Get(namespace, name string) (Ioc, error) {
+func (c *container) Get(namespace, name string) (Ioc, error) {
 	if ns, exists := c.store[namespace]; exists {
 		if ioc, exists := ns.ioc[name]; exists {
 			return ioc.object, nil
@@ -91,7 +96,7 @@ func (c *Container) Get(namespace, name string) (Ioc, error) {
 	return nil, errors.NotFound("namespace not found", "namespace: %s, name: %s", namespace, name)
 }
 
-func (c *Container) RegistryNamespace(namespace string, priority ...int) {
+func (c *container) RegistryNamespace(namespace string, priority ...int) {
 	if _, exists := c.store[namespace]; !exists {
 		prio := defaultPriority
 		if len(priority) > 0 {
@@ -99,11 +104,11 @@ func (c *Container) RegistryNamespace(namespace string, priority ...int) {
 		}
 
 		c.store[namespace] = &ns{name: namespace, ioc: map[string]*ioc{}, priority: prio}
-		log.Infof("registry namespace: %s", namespace)
+		c.log.Infof("registry namespace: %s", namespace)
 	}
 }
 
-func (c *Container) Registry(namespace string, object Ioc, priority ...int) {
+func (c *container) Registry(namespace string, object Ioc, priority ...int) {
 	if ns, exists := c.store[namespace]; exists {
 		prio := defaultPriority
 		if len(priority) > 0 {
@@ -112,29 +117,29 @@ func (c *Container) Registry(namespace string, object Ioc, priority ...int) {
 		objectName := object.Name()
 
 		ns.ioc[objectName] = &ioc{name: objectName, object: object, priority: prio}
-		log.Infof("%s registry: %s", namespace, objectName)
+		c.log.Infof("%s registry: %s", namespace, objectName)
 	}
 }
 
-func (c *Container) GinIRouterRegistry(r gin.IRouter) {
+func (c *container) GinIRouterRegistry(r gin.IRouter) {
 	for _, ioc := range c.store[RouterNamespace].ioc {
 		if router, ok := ioc.object.(GinIRouter); ok {
 			router.Registry(r)
-			log.Infof("GinIRouterRegistry: %s", ioc.name)
+			c.log.Infof("GinIRouterRegistry: %s", ioc.name)
 		}
 	}
 }
 
 // Close will close all the ioc.Closer
 // 倒序关闭所有实现了 ioc.Closer 的对象
-func (c *Container) Close() {
+func (c *container) Close() {
 	c.reverse()
 	for _, ns := range c.sorted {
 		ns.reverse()
 		for _, ioc := range ns.sorted {
 			if closer, ok := ioc.object.(Closer); ok {
 				closer.Close()
-				log.Infof("%s close: %s", ns.name, ioc.name)
+				c.log.Infof("%s close: %s", ns.name, ioc.name)
 			}
 		}
 	}
