@@ -92,7 +92,6 @@ func (c *container) Get(namespace, name string) Ioc {
 		c.log.Errorf("ioc not found: %s", name)
 	}
 
-	c.log.Errorf("namespace not found: %s", namespace)
 	return nil
 }
 
