@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/luyasr/gaia/errors"
+	"github.com/luyasr/gaia/ioc"
 	"github.com/luyasr/gaia/log"
 	"github.com/luyasr/gaia/log/zerolog"
 	"github.com/luyasr/gaia/transport"
@@ -106,6 +107,10 @@ func (a *App) Shutdown(ctx context.Context) error {
 			return svr.Shutdown(shutdownCtx)
 		})
 	}
+
+	eg.Go(func() error {
+		return ioc.Container.Close()
+	})
 
 	return eg.Wait()
 }

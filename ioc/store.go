@@ -132,15 +132,19 @@ func (c *container) GinIRouterRegistry(r gin.IRouter) {
 
 // Close will close all the ioc.Closer
 // 倒序关闭所有实现了 ioc.Closer 的对象
-func (c *container) Close() {
+func (c *container) Close() error {
 	c.reverse()
 	for _, ns := range c.sorted {
 		ns.reverse()
 		for _, ioc := range ns.sorted {
 			if closer, ok := ioc.object.(Closer); ok {
-				closer.Close()
+				if err := closer.Close(); err != nil {
+					return err
+				}
 				c.log.Infof("%s close: %s", ns.name, ioc.name)
 			}
 		}
 	}
+
+	return nil
 }
