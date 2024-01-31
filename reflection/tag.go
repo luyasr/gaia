@@ -7,8 +7,20 @@ import (
 	"github.com/luyasr/gaia/errors"
 )
 
+func must(obj any) (reflect.Type, reflect.Value, error) {
+	valueOf := reflect.ValueOf(obj)
+	if valueOf.Kind() != reflect.Ptr || valueOf.IsNil() {
+		return nil, reflect.Value{}, errors.Internal("reflect", "must be a non null pointer to a struct")
+	}
+
+	valueOf = valueOf.Elem()
+	typeOf := valueOf.Type()
+
+	return typeOf, valueOf, nil
+}
+
 func SetDefaultTag(obj any) error {
-	typeOf, valueOf, err := Must(obj)
+	typeOf, valueOf, err := must(obj)
 	if err != nil {
 		return err
 	}

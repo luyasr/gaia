@@ -15,6 +15,7 @@ type Config struct {
 	Charset         string `json:"charset" default:"utf8mb4"`
 	ParseTime       *bool  `json:"parse_time" default:"true"`
 	Loc             string `json:"loc" default:"Local"`
+	Timeout         int    `json:"timeout" default:"10"`
 	MaxIdleConns    int    `json:"max_idle_conns" default:"10"`
 	MaxOpenConns    int    `json:"max_open_conns" default:"100"`
 	ConnMaxLifetime int    `json:"conn_max_lifetime" default:"3600"`
@@ -31,7 +32,7 @@ func (c *Config) dsn() string {
 		parseTime = "True"
 	}
 
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=%s&loc=%s",
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=%s&loc=%s&timeout=%ds",
 		c.Username,
 		c.Password,
 		c.address(),
@@ -39,6 +40,7 @@ func (c *Config) dsn() string {
 		c.Charset,
 		parseTime,
 		c.Loc,
+		c.Timeout,
 	)
 }
 

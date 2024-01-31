@@ -8,14 +8,15 @@ import (
 // If you want to remove default zero values, you can use pointer types in the struct.
 func StructToMap(obj any) map[string]any {
 	valueOf := reflect.ValueOf(obj)
-	typeOf := valueOf.Type()
-	typeOfNumField := typeOf.NumField()
-	resultMap := make(map[string]any, typeOfNumField)
 
 	// If the object is a pointer, dereference it.
 	if valueOf.Kind() == reflect.Ptr {
 		valueOf = valueOf.Elem()
 	}
+
+	typeOf := valueOf.Type()
+	typeOfNumField := typeOf.NumField()
+	resultMap := make(map[string]any, typeOfNumField)
 
 	// Iterate over all fields of the struct.
 	for i := 0; i < typeOfNumField; i++ {
