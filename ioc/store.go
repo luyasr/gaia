@@ -4,7 +4,6 @@ import (
 	"sort"
 
 	"github.com/gin-gonic/gin"
-	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/log"
 )
 
@@ -85,15 +84,16 @@ func (c *container) Init() error {
 	return nil
 }
 
-func (c *container) Get(namespace, name string) (Ioc, error) {
+func (c *container) Get(namespace, name string) Ioc {
 	if ns, exists := c.store[namespace]; exists {
 		if ioc, exists := ns.ioc[name]; exists {
-			return ioc.object, nil
+			return ioc.object
 		}
-		return nil, errors.NotFound("ioc not found", "namespace: %s, name: %s", namespace, name)
+		c.log.Errorf("ioc not found: %s", name)
 	}
 
-	return nil, errors.NotFound("namespace not found", "namespace: %s, name: %s", namespace, name)
+	c.log.Errorf("namespace not found: %s", namespace)
+	return nil
 }
 
 func (c *container) RegistryNamespace(namespace string, priority ...int) {

@@ -98,6 +98,7 @@ func (a *App) Run() error {
 func (a *App) Shutdown(ctx context.Context) error {
 	eg, c := errgroup.WithContext(ctx)
 
+	// 关闭 servers
 	for _, svr := range a.servers {
 		svr := svr
 		eg.Go(func() error {
@@ -108,6 +109,7 @@ func (a *App) Shutdown(ctx context.Context) error {
 		})
 	}
 
+	// 关闭 ioc 中实现了 io.Closer 的对象, 一般是数据库连接等
 	eg.Go(func() error {
 		return ioc.Container.Close()
 	})
