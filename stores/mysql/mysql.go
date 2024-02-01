@@ -46,10 +46,11 @@ func (m *Mysql) Init() error {
 		return errors.Internal("mysql", "Mysql type assertion failed, expected *Config, got %T", mysqlCfg)
 	}
 
-	_, err := New(mysqlInstance)
+	rdb, err := New(mysqlInstance)
 	if err != nil {
 		return err
 	}
+	m.Client = rdb.Client
 
 	return nil
 }
