@@ -77,7 +77,7 @@ func (c *container) Init() error {
 			if err != nil {
 				return err
 			}
-			c.log.Infof("%s init: %s", ns.name, ioc.name)
+			c.log.Infof("initialization successful for: %s in namespace: %s", ioc.name, ns.name)
 		}
 	}
 
@@ -104,7 +104,7 @@ func (c *container) RegistryNamespace(namespace string, priority ...int) {
 		}
 
 		c.store[namespace] = &ns{name: namespace, ioc: map[string]*ioc{}, priority: prio}
-		c.log.Infof("registry namespace: %s", namespace)
+		c.log.Infof("registered new namespace: %s", namespace)
 	}
 }
 
@@ -118,7 +118,7 @@ func (c *container) Registry(namespace string, object Ioc, priority ...int) {
 		objectName := object.Name()
 
 		ns.ioc[objectName] = &ioc{name: objectName, object: object, priority: prio}
-		c.log.Infof("%s registry: %s", namespace, objectName)
+		c.log.Infof("registered new object: %s in namespace: %s", objectName, namespace)
 	}
 }
 
@@ -127,7 +127,7 @@ func (c *container) GinIRouterRegistry(r gin.IRouter) {
 	for _, ioc := range c.store[RouterNamespace].ioc {
 		if router, ok := ioc.object.(GinIRouter); ok {
 			router.Registry(r)
-			c.log.Infof("GinIRouterRegistry: %s", ioc.name)
+			c.log.Infof("registered new GinIRouter: %s", ioc.name)
 		}
 	}
 }
@@ -143,7 +143,7 @@ func (c *container) Close() error {
 				if err := closer.Close(); err != nil {
 					return err
 				}
-				c.log.Infof("%s close: %s", ns.name, ioc.name)
+				c.log.Infof("Closed object: %s in namespace: %s", ioc.name, ns.name)
 			}
 		}
 	}
