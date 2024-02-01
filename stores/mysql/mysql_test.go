@@ -4,6 +4,10 @@ import (
 	"testing"
 )
 
+type MysqlCfg struct {
+	Mysql *Config
+}
+
 func TestNewMysql(t *testing.T) {
 	parseTime := true
 	// 创建一个模拟的 Config 对象

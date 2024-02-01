@@ -8,8 +8,6 @@ import (
 	"github.com/luyasr/gaia/reflection"
 )
 
-const defaultPriority = 0
-
 type container struct {
 	store  map[string]*ns
 	sorted []*ns
@@ -69,6 +67,7 @@ func (n *ns) reverse() {
 	}
 }
 
+// Init will init all the ioc.Init
 func (c *container) Init() error {
 	c.sort()
 	for _, ns := range c.sorted {
@@ -85,6 +84,7 @@ func (c *container) Init() error {
 	return nil
 }
 
+// Get will get the object from the container
 func (c *container) Get(namespace, name string) Ioc {
 	if ns, exists := c.store[namespace]; exists {
 		if ioc, exists := ns.ioc[name]; exists {
@@ -95,9 +95,10 @@ func (c *container) Get(namespace, name string) Ioc {
 	return nil
 }
 
+// RegistryNamespace will registry the namespace to the container
 func (c *container) RegistryNamespace(namespace string, priority ...int) {
 	if _, exists := c.store[namespace]; !exists {
-		prio := defaultPriority
+		prio := len(c.store)
 		if len(priority) > 0 {
 			prio = priority[0]
 		}
@@ -107,9 +108,10 @@ func (c *container) RegistryNamespace(namespace string, priority ...int) {
 	}
 }
 
+// Registry will registry the object to the container
 func (c *container) Registry(namespace string, object Ioc, priority ...int) {
 	if ns, exists := c.store[namespace]; exists {
-		prio := defaultPriority
+		prio := len(c.store[namespace].ioc)
 		if len(priority) > 0 {
 			prio = priority[0]
 		}
@@ -120,6 +122,7 @@ func (c *container) Registry(namespace string, object Ioc, priority ...int) {
 	}
 }
 
+// GinIRouterRegistry will registry all the GinIRouter to the gin.IRouter
 func (c *container) GinIRouterRegistry(r gin.IRouter) {
 	for _, ioc := range c.store[RouterNamespace].ioc {
 		if router, ok := ioc.object.(GinIRouter); ok {
@@ -148,8 +151,10 @@ func (c *container) Close() error {
 	return nil
 }
 
+// GetFieldValueByConfig will get the field value from the config
 func (c *container) GetFieldValueByConfig(field string) (any, bool) {
 	cfg := Container.Get(ConfigNamespace, "config")
+	log.Infof("cfg: %v", cfg)
 	if cfg == nil {
 		return nil, false
 	}
