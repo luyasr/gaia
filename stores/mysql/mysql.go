@@ -6,6 +6,7 @@ import (
 
 	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/ioc"
+	"github.com/luyasr/gaia/log"
 	"github.com/luyasr/gaia/reflection"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -33,11 +34,13 @@ func (m *Mysql) Init() error {
 	}
 
 	mysqlCfg, ok := reflection.GetFieldValue(cfg, "Mysql")
+	log.Info("mysqlCfg: %v, %v", mysqlCfg, ok)
 	if !ok {
 		return nil
 	}
 
 	mysqlInstance, ok := mysqlCfg.(*Config)
+	log.Info("mysqlInstance: %v, %v", mysqlInstance, ok)
 	if !ok {
 		return errors.Internal("mysql", "Mysql type assertion failed, expected *Config, got %T", mysqlCfg)
 	}
