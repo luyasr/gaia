@@ -109,10 +109,11 @@ func (a *App) Shutdown(ctx context.Context) error {
 		})
 	}
 
-	// 关闭 ioc 中实现了 ioc.Closer 的对象, 一般是数据库连接等
-	eg.Go(func() error {
-		return ioc.Container.Close()
-	})
+    // 等待所有 servers 关闭
+    if err := eg.Wait(); err != nil {
+        return err
+    }	
 
-	return eg.Wait()
+	// 关闭 ioc 容器中实现了 ioc.Closer 接口的对象
+	return ioc.Container.Close()
 }

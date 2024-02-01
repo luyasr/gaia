@@ -6,8 +6,6 @@ import (
 
 	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/ioc"
-	"github.com/luyasr/gaia/log"
-	"github.com/luyasr/gaia/reflection"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -17,6 +15,11 @@ const name = "mysql"
 
 var once sync.Once
 
+var (
+	cfgByIoc   any
+	cfgByIocOk bool
+)
+
 type Mysql struct {
 	Client *gorm.DB
 }
@@ -24,29 +27,23 @@ type Mysql struct {
 type Option func(*Mysql)
 
 func init() {
-	ioc.Container.Registry(ioc.DbNamespace, &Mysql{})
+	cfgByIoc, cfgByIocOk = ioc.Container.GetFieldValueByConfig("Mysql")
+	if cfgByIocOk {
+		ioc.Container.Registry(ioc.DbNamespace, &Mysql{})
+	}
 }
 
 func (m *Mysql) Init() error {
-	cfg := ioc.Container.Get(ioc.ConfigNamespace, "config")
-	log.Info("cfg: %v", cfg)
-	if cfg == nil {
-		return nil
-	}
-	
-	mysqlCfg, ok := reflection.GetFieldValue(cfg, "Mysql")
-	log.Info("mysqlCfg: %v, %v", mysqlCfg, ok)
-	if !ok {
+	if !cfgByIocOk {
 		return nil
 	}
 
-	mysqlInstance, ok := mysqlCfg.(*Config)
-	log.Info("mysqlInstance: %v, %v", mysqlInstance, ok)
+	mysqlCfg, ok := cfgByIoc.(*Config)
 	if !ok {
-		return errors.Internal("mysql", "Mysql type assertion failed, expected *Config, got %T", mysqlCfg)
+		return errors.Internal("mysql", "Mysql type assertion failed, expected *Config, got %T", cfgByIoc)
 	}
 
-	rdb, err := New(mysqlInstance)
+	rdb, err := New(mysqlCfg)
 	if err != nil {
 		return err
 	}
@@ -60,8 +57,7 @@ func (m *Mysql) Name() string {
 }
 
 func New(c *Config, opts ...Option) (*Mysql, error) {
-	err := c.initConfig()
-	if err != nil {
+	if err := c.initConfig(); err != nil {
 		return nil, err
 	}
 
@@ -71,7 +67,7 @@ func New(c *Config, opts ...Option) (*Mysql, error) {
 		opt(m)
 	}
 
-	m, err = new(c, m)
+	m, err := new(c, m)
 	if err != nil {
 		return nil, err
 	}

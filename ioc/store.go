@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/luyasr/gaia/log"
+	"github.com/luyasr/gaia/reflection"
 )
 
 const defaultPriority = 0
@@ -89,7 +90,6 @@ func (c *container) Get(namespace, name string) Ioc {
 		if ioc, exists := ns.ioc[name]; exists {
 			return ioc.object
 		}
-		c.log.Errorf("ioc not found: %s", name)
 	}
 
 	return nil
@@ -146,4 +146,13 @@ func (c *container) Close() error {
 	}
 
 	return nil
+}
+
+func (c *container) GetFieldValueByConfig(field string) (any, bool) {
+	cfg := Container.Get(ConfigNamespace, "config")
+	if cfg == nil {
+		return nil, false
+	}
+
+	return reflection.GetFieldValue(cfg, field)
 }

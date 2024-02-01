@@ -5,12 +5,21 @@ import (
 	"sync"
 	"time"
 
+	"github.com/luyasr/gaia/errors"
+	"github.com/luyasr/gaia/ioc"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+const name = "mongo"
+
 var once sync.Once
+
+var (
+	cfgByIoc   any
+	cfgByIocOk bool
+)
 
 type Mongo struct {
 	Client *mongo.Client
@@ -18,9 +27,38 @@ type Mongo struct {
 
 type Option func(*Mongo)
 
-func New(c *Config, opts ...Option) (*Mongo, error) {
-	err := c.initConfig()
+func init() {
+	cfgByIoc, cfgByIocOk = ioc.Container.GetFieldValueByConfig("Mongo")
+	if cfgByIocOk {
+		ioc.Container.Registry(ioc.DbNamespace, &Mongo{})
+	}
+}
+
+func (m *Mongo) Init() error {
+	if !cfgByIocOk {
+		return nil
+	}
+
+	mongoCfg, ok := cfgByIoc.(*Config)
+	if !ok {
+		return errors.Internal("mongo", "Mongo type assertion failed, expected *Config, got %T", cfgByIoc)
+	}
+
+	rdb, err := New(mongoCfg)
 	if err != nil {
+		return err
+	}
+	m.Client = rdb.Client
+
+	return nil
+}
+
+func (m *Mongo) Name() string {
+	return name
+}
+
+func New(c *Config, opts ...Option) (*Mongo, error) {
+	if err := c.initConfig(); err != nil {
 		return nil, err
 	}
 
@@ -30,7 +68,7 @@ func New(c *Config, opts ...Option) (*Mongo, error) {
 		opt(m)
 	}
 
-	m, err = new(c, m)
+	m, err := new(c, m)
 	if err != nil {
 		return nil, err
 	}
@@ -67,10 +105,5 @@ func (m *Mongo) ping() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	err := m.Client.Ping(ctx, readpref.Primary())
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.Client.Ping(ctx, readpref.Primary())
 }
