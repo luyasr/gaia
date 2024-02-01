@@ -29,10 +29,11 @@ func init() {
 
 func (m *Mysql) Init() error {
 	cfg := ioc.Container.Get(ioc.ConfigNamespace, "config")
+	log.Info("cfg: %v", cfg)
 	if cfg == nil {
 		return nil
 	}
-
+	
 	mysqlCfg, ok := reflection.GetFieldValue(cfg, "Mysql")
 	log.Info("mysqlCfg: %v, %v", mysqlCfg, ok)
 	if !ok {
