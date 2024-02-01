@@ -154,7 +154,6 @@ func (c *container) Close() error {
 // GetFieldValueByConfig will get the field value from the config
 func (c *container) GetFieldValueByConfig(field string) (any, bool) {
 	cfg := Container.Get(ConfigNamespace, "config")
-	log.Infof("cfg: %v", cfg)
 	if cfg == nil {
 		return nil, false
 	}

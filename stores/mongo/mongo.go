@@ -16,11 +16,6 @@ const name = "mongo"
 
 var once sync.Once
 
-var (
-	cfgByIoc   any
-	cfgByIocOk bool
-)
-
 type Mongo struct {
 	Client *mongo.Client
 }
@@ -28,20 +23,18 @@ type Mongo struct {
 type Option func(*Mongo)
 
 func init() {
-	cfgByIoc, cfgByIocOk = ioc.Container.GetFieldValueByConfig("Mongo")
-	if cfgByIocOk {
-		ioc.Container.Registry(ioc.DbNamespace, &Mongo{})
-	}
+	ioc.Container.Registry(ioc.DbNamespace, &Mongo{})
 }
 
 func (m *Mongo) Init() error {
-	if !cfgByIocOk {
+	cfg, ok := ioc.Container.GetFieldValueByConfig("Mongo")
+	if !ok {
 		return nil
 	}
 
-	mongoCfg, ok := cfgByIoc.(*Config)
+	mongoCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Internal("mongo", "Mongo type assertion failed, expected *Config, got %T", cfgByIoc)
+		return errors.Internal("mongo", "Mongo type assertion failed, expected *Config, got %T", cfg)
 	}
 
 	rdb, err := New(mongoCfg)

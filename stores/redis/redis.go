@@ -14,11 +14,6 @@ const name = "redis"
 
 var once sync.Once
 
-var (
-	cfgByIoc   any
-	cfgByIocOk bool
-)
-
 type Redis struct {
 	Client *redis.Client
 }
@@ -26,20 +21,18 @@ type Redis struct {
 type Option func(*Redis)
 
 func init() {
-	cfgByIoc, cfgByIocOk = ioc.Container.GetFieldValueByConfig("Redis")
-	if cfgByIocOk {
-		ioc.Container.Registry(ioc.DbNamespace, &Redis{})
-	}
+	ioc.Container.Registry(ioc.DbNamespace, &Redis{})
 }
 
 func (r *Redis) Init() error {
-	if !cfgByIocOk {
+	cfg, ok := ioc.Container.GetFieldValueByConfig("Redis")
+	if !ok {
 		return nil
 	}
 
-	redisCfg, ok := cfgByIoc.(*Config)
+	redisCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Internal("redis", "Redis type assertion failed, expected *Config, got %T", cfgByIoc)
+		return errors.Internal("redis", "Redis type assertion failed, expected *Config, got %T", cfg)
 	}
 
 	rdb, err := New(redisCfg)
