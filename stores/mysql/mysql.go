@@ -6,6 +6,7 @@ import (
 
 	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/ioc"
+	"github.com/luyasr/gaia/log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -28,6 +29,7 @@ type Option func(*Mysql)
 
 func init() {
 	cfgByIoc, cfgByIocOk = ioc.Container.GetFieldValueByConfig("Mysql")
+	log.Infof("cfgByIoc: %v, cfgByIocOk: %v", cfgByIoc, cfgByIocOk)
 	if cfgByIocOk {
 		ioc.Container.Registry(ioc.DbNamespace, &Mysql{})
 	}
