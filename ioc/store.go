@@ -134,6 +134,7 @@ func (c *container) GinIRouterRegistry(r gin.IRouter) {
 
 // Close will close all the ioc.Closer
 // 倒序关闭所有实现了 ioc.Closer 的对象
+// TODO 使用errorgroup关闭
 func (c *container) Close() error {
 	c.reverse()
 	for _, ns := range c.sorted {
