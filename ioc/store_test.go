@@ -20,9 +20,26 @@ func (m *mockIoc) Close() error {
 	return nil
 }
 
+type Config struct {
+	Mysql Mysql `json:"mysql"`
+}
+
+type Mysql struct {
+	Host string `json:"host"`
+	Port int `json:"port"`
+}
+
+func (c *Config) Init() error {
+	return nil
+}
+
+func (c *Config) Name() string {
+	return "config"
+}
+
 func TestRegistryAndGet(t *testing.T) {
 	Container.Registry(DbNamespace, &mockIoc{name: "1"})
-	Container.Registry(ConfigNamespace, &mockIoc{name: "2"})
+	Container.Registry(ConfigNamespace, &Config{})
 	Container.Registry(ConfigNamespace, &mockIoc{name: "3"})
 	Container.Registry(ControllerNamespace, &mockIoc{name: "4"})
 	Container.Registry(RouterNamespace, &mockIoc{name: "5"})

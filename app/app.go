@@ -111,8 +111,6 @@ func (a *App) Shutdown(ctx context.Context) error {
 
 	// 关闭 ioc 中实现了 ioc.Closer 的对象, 一般是数据库连接等
 	eg.Go(func() error {
-		a.log.Info(ioc.Container)
-		a.log.Infof("ioc container shutdown...")
 		return ioc.Container.Close()
 	})
 
