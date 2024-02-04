@@ -49,7 +49,8 @@ func (r *Redis) Name() string {
 }
 
 func New(c *Config, opts ...Option) (*Redis, error) {
-	if err := c.initConfig(); err != nil {
+	cfg, err := c.initConfig(); 
+	if err != nil {
 		return nil, err
 	}
 
@@ -63,12 +64,7 @@ func New(c *Config, opts ...Option) (*Redis, error) {
 		opt(r)
 	}
 
-	r, err := new(c, r)
-	if err != nil {
-		return nil, err
-	}
-
-	return r, nil
+	return new(cfg, r)
 }
 
 func new(c *Config, r *Redis) (*Redis, error) {

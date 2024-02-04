@@ -51,7 +51,8 @@ func (m *Mongo) Name() string {
 }
 
 func New(c *Config, opts ...Option) (*Mongo, error) {
-	if err := c.initConfig(); err != nil {
+	cfg, err := c.initConfig();
+	if err != nil {
 		return nil, err
 	}
 
@@ -61,12 +62,7 @@ func New(c *Config, opts ...Option) (*Mongo, error) {
 		opt(m)
 	}
 
-	m, err := new(c, m)
-	if err != nil {
-		return nil, err
-	}
-
-	return m, nil
+	return new(cfg, m)
 }
 
 func new(c *Config, m *Mongo) (*Mongo, error) {

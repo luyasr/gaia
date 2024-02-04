@@ -50,22 +50,17 @@ func New(opts ...Option) (*Config, error) {
 		opt(cfg)
 	}
 
-	err := cfg.initConfig()
-	if err != nil {
+	if err := cfg.initConfig(); err != nil {
 		return cfg, err
 	}
+
+	cfg.configureViper()
 
 	return cfg, nil
 }
 
 func (cfg *Config) initConfig() error {
-	if err := reflection.SetUp(cfg.target); err != nil {
-		return err
-	}
-
-	cfg.configureViper()
-
-	return nil
+	return reflection.SetUp(cfg.target)
 }
 
 func (cfg *Config) configureViper() {

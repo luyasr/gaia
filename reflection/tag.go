@@ -11,8 +11,13 @@ const reason = "reflection setting default failed"
 
 func must(obj any) (reflect.Type, reflect.Value, error) {
 	valueOf := reflect.ValueOf(obj)
-	if valueOf.Kind() != reflect.Ptr || valueOf.IsNil() {
+
+	if valueOf.Kind() != reflect.Ptr {
 		return nil, reflect.Value{}, errors.Internal(reason, "expected a pointer, got %v", valueOf)
+	}
+
+	if valueOf.IsNil() {
+		return nil, reflect.Value{}, errors.Internal(reason, "expected a non-nil pointer, got %v", valueOf)
 	}
 
 	valueOf = valueOf.Elem()

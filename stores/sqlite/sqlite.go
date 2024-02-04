@@ -48,7 +48,8 @@ func (s *Sqlite) Name() string {
 }
 
 func New(c *Config, opts ...Option) (*Sqlite, error) {
-	if err := c.initConfig(); err != nil {
+	cfg, err := c.initConfig(); 
+	if err != nil {
 		return nil, err
 	}
 
@@ -58,12 +59,7 @@ func New(c *Config, opts ...Option) (*Sqlite, error) {
 		opt(s)
 	}
 
-	s, err := new(c, s)
-	if err != nil {
-		return nil, err
-	}
-
-	return s, nil
+	return new(cfg, s)
 }
 
 func new(c *Config, s *Sqlite) (*Sqlite, error) {

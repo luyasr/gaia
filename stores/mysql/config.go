@@ -59,6 +59,14 @@ func (c *Config) logLevel() int {
 	}
 }
 
-func (c *Config) initConfig() error {
-	return reflection.SetUp(c)
+func (c *Config) initConfig() (*Config, error) {
+	if c == nil {
+		c = &Config{}
+	}
+
+	if err := reflection.SetUp(c); err != nil {
+		return nil, err
+	}
+
+	return c, nil
 }

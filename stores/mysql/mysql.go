@@ -50,7 +50,8 @@ func (m *Mysql) Name() string {
 }
 
 func New(c *Config, opts ...Option) (*Mysql, error) {
-	if err := c.initConfig(); err != nil {
+	cfg, err := c.initConfig(); 
+	if err != nil {
 		return nil, err
 	}
 
@@ -60,17 +61,12 @@ func New(c *Config, opts ...Option) (*Mysql, error) {
 		opt(m)
 	}
 
-	m, err := new(c, m)
-	if err != nil {
-		return nil, err
-	}
-
-	return m, nil
+	return new(cfg, m)
 }
 
 func new(c *Config, m *Mysql) (*Mysql, error) {
 	var err error
-	
+
 	once.Do(func() {
 		m.Client, err = gorm.Open(mysql.Open(c.dsn()), &gorm.Config{
 			Logger: logger.Default.LogMode(logger.LogLevel(c.logLevel())),
