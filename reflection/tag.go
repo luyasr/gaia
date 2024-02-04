@@ -7,10 +7,12 @@ import (
 	"github.com/luyasr/gaia/errors"
 )
 
+const reason = "reflection setting default failed"
+
 func must(obj any) (reflect.Type, reflect.Value, error) {
 	valueOf := reflect.ValueOf(obj)
 	if valueOf.Kind() != reflect.Ptr || valueOf.IsNil() {
-		return nil, reflect.Value{}, errors.Internal("reflect", "must be a non null pointer to a struct")
+		return nil, reflect.Value{}, errors.Internal(reason, "expected a pointer, got %v", valueOf)
 	}
 
 	valueOf = valueOf.Elem()
@@ -35,25 +37,25 @@ func SetDefaultTag(obj any) error {
 			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 				parseInt, err := strconv.ParseInt(tag, 10, 64)
 				if err != nil {
-					return errors.Internal("reflection setting default failed", "error parsing int: %s", err)
+					return errors.Internal(reason, "error parsing int: %s", err)
 				}
 				vFiled.SetInt(parseInt)
 			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 				parseUint, err := strconv.ParseUint(tag, 10, 64)
 				if err != nil {
-					return errors.Internal("reflection setting default failed", "error parsing uint: %s", err)
+					return errors.Internal(reason, "error parsing uint: %s", err)
 				}
 				vFiled.SetUint(parseUint)
 			case reflect.Float32, reflect.Float64:
 				parseFloat, err := strconv.ParseFloat(tag, 64)
 				if err != nil {
-					return errors.Internal("reflection setting default failed", "error parsing float: %s", err)
+					return errors.Internal(reason, "error parsing float: %s", err)
 				}
 				vFiled.SetFloat(parseFloat)
 			case reflect.Bool:
 				parseBool, err := strconv.ParseBool(tag)
 				if err != nil {
-					return errors.Internal("reflection setting default failed", "error parsing bool: %s", err)
+					return errors.Internal(reason, "error parsing bool: %s", err)
 				}
 				vFiled.SetBool(parseBool)
 			case reflect.Ptr:
@@ -61,7 +63,7 @@ func SetDefaultTag(obj any) error {
 			case reflect.Struct:
 				SetDefaultTag(vFiled.Addr().Interface())
 			default:
-				return errors.Internal("reflection setting default failed", "unsupported type: %s", vFiled.Kind())
+				return errors.Internal(reason, "unsupported type: %s", vFiled.Kind())
 			}
 		}
 	}
