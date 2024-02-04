@@ -28,6 +28,12 @@ func Address(address string) ServerOption {
 	}
 }
 
+func Logger(logger *log.Helper) ServerOption {
+	return func(s *Server) {
+		s.log = logger
+	}
+}
+
 func NewServer(opt ...ServerOption) *Server {
 	svc := &Server{
 		server: grpc.NewServer(),
