@@ -70,6 +70,7 @@ func New(c *Config, opts ...Option) (*Mysql, error) {
 
 func new(c *Config, m *Mysql) (*Mysql, error) {
 	var err error
+	
 	once.Do(func() {
 		m.Client, err = gorm.Open(mysql.Open(c.dsn()), &gorm.Config{
 			Logger: logger.Default.LogMode(logger.LogLevel(c.logLevel())),
@@ -87,11 +88,8 @@ func new(c *Config, m *Mysql) (*Mysql, error) {
 		sqlDB.SetMaxOpenConns(c.MaxOpenConns)
 		sqlDB.SetConnMaxLifetime(time.Duration(c.ConnMaxLifetime))
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	return m, nil
+	return m, err
 }
 
 func (m *Mysql) Close() error {

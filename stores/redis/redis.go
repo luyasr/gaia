@@ -73,6 +73,7 @@ func New(c *Config, opts ...Option) (*Redis, error) {
 
 func new(c *Config, r *Redis) (*Redis, error) {
 	var err error
+	
 	once.Do(func() {
 		r.Client = redis.NewClient(&redis.Options{
 			Addr:     c.address(),
@@ -85,11 +86,7 @@ func new(c *Config, r *Redis) (*Redis, error) {
 		_, err = r.Client.Ping(context.Background()).Result()
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	return r, nil
+	return r, err
 }
 
 func (r *Redis) Close() error {

@@ -60,9 +60,5 @@ func (c *Config) logLevel() int {
 }
 
 func (c *Config) initConfig() error {
-	if err := reflection.SetUp(c); err != nil {
-		return err
-	}
-
-	return nil
+	return reflection.SetUp(c)
 }

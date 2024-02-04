@@ -79,11 +79,8 @@ func new(c *Config, m *Mongo) (*Mongo, error) {
 
 		err = m.ping()
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	return m, nil
+	return m, err
 }
 
 func (m *Mongo) Close() error {

@@ -5,11 +5,7 @@ import (
 )
 
 func SetUp(obj any) error {
-	if err := SetDefaultTag(obj); err != nil {
-		return err
-	}
-
-	return nil
+	return SetDefaultTag(obj)
 }
 
 func GetFieldValue(structure any, fieldName string) (any, bool) {
