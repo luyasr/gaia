@@ -94,7 +94,7 @@ func (a *App) Run() error {
 			return nil
 		case s := <-ch:
 			a.log.Infof("receive signal %s, shutdown server", s)
-			return ctx.Err()
+			return context.Canceled
 		}
 	})
 
