@@ -49,7 +49,7 @@ func Signal(sigs []os.Signal) Option {
 
 func New(opt ...Option) *App {
 	app := &App{
-		ctx:             context.Background(),
+		ctx:             context.TODO(),
 		shutdownTimeout: 10 * time.Second,
 		sigs:            []os.Signal{os.Interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT},
 		log:             log.NewHelper(zerolog.New(zerolog.DefaultLogger)),
@@ -65,6 +65,10 @@ func New(opt ...Option) *App {
 func (a *App) Run() error {
 	eg, ctx := errgroup.WithContext(a.ctx)
 
+	// handle signals
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, a.sigs...)
+
 	// run servers
 	for _, svr := range a.servers {
 		svr := svr
@@ -73,9 +77,6 @@ func (a *App) Run() error {
 		})
 	}
 
-	// handle signals
-	ch := make(chan os.Signal, 1)
-	signal.Notify(ch, a.sigs...)
 	eg.Go(func() error {
 		s := <-ch
 		a.log.Infof("receive signal %s, shutdown server", s)
