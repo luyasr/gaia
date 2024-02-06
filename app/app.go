@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -84,9 +83,13 @@ func (a *App) Run() error {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, a.sigs...)
 	eg.Go(func() error {
-		s := <-ch
-		a.log.Infof("receive signal %s, shutdown server", s)
-		return a.Shutdown(ctx)
+		select {
+		case s := <-ch:
+			a.log.Infof("receive signal %s, shutdown server", s)
+			return a.Shutdown(ctx)
+		case <-ctx.Done():
+			return nil
+		}
 	})
 
 	if err := eg.Wait(); err != nil && !errors.Is(err, context.Canceled) {
@@ -100,9 +103,8 @@ func (a *App) Shutdown(ctx context.Context) error {
 	eg, c := errgroup.WithContext(ctx)
 
 	// 关闭 servers
-	for i, svr := range a.servers {
+	for _, svr := range a.servers {
 		svr := svr
-		fmt.Printf("shutdown server %d\nserver %v", i, svr)
 		eg.Go(func() error {
 			shutdownCtx, cancel := context.WithTimeout(c, a.shutdownTimeout)
 			defer cancel()
