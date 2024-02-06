@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 
@@ -65,14 +64,11 @@ func New(opt ...Option) *App {
 
 func (a *App) Run() error {
 	eg, ctx := errgroup.WithContext(a.ctx)
-	wg := sync.WaitGroup{}
 
 	// run servers
 	for _, svr := range a.servers {
-		wg.Add(1)
 		svr := svr
 		eg.Go(func() error {
-			defer wg.Done()
 			return svr.Run()
 		})
 	}
@@ -83,10 +79,12 @@ func (a *App) Run() error {
 	eg.Go(func() error {
 		s := <-ch
 		a.log.Infof("receive signal %s, shutdown server", s)
-		return a.Shutdown(ctx)
+		if err := a.Shutdown(ctx); err != nil {
+			return err
+		}
+		// Wait for all servers to finish running
+		return eg.Wait()
 	})
-
-	wg.Wait()
 
 	if err := eg.Wait(); err != nil && !errors.Is(err, context.Canceled) {
 		return err
