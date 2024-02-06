@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -64,14 +65,25 @@ func New(opt ...Option) *App {
 
 func (a *App) Run() error {
 	eg, ctx := errgroup.WithContext(a.ctx)
+	wg := sync.WaitGroup{}
 
 	// run servers
 	for _, svr := range a.servers {
 		svr := svr
 		eg.Go(func() error {
+			<-ctx.Done() // wait for signal
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), a.shutdownTimeout)
+			defer cancel()
+			return svr.Shutdown(shutdownCtx)
+		})
+		wg.Add(1)
+		eg.Go(func() error {
+			wg.Done()
 			return svr.Run()
 		})
 	}
+
+	wg.Wait()
 
 	// handle signals
 	ch := make(chan os.Signal, 1)
@@ -82,7 +94,7 @@ func (a *App) Run() error {
 			return nil
 		case s := <-ch:
 			a.log.Infof("receive signal %s, shutdown server", s)
-			return a.Shutdown(ctx)
+			return ctx.Err()
 		}
 	})
 
@@ -90,28 +102,28 @@ func (a *App) Run() error {
 		return err
 	}
 
-	return nil
-}
-
-func (a *App) Shutdown(ctx context.Context) error {
-	eg, c := errgroup.WithContext(ctx)
-
-	// 关闭 servers
-	for _, svr := range a.servers {
-		svr := svr
-		eg.Go(func() error {
-			shutdownCtx, cancel := context.WithTimeout(c, a.shutdownTimeout)
-			defer cancel()
-
-			return svr.Shutdown(shutdownCtx)
-		})
-	}
-
-    // 等待所有 servers 关闭
-    if err := eg.Wait(); err != nil {
-        return err
-    }	
-
-	// 关闭 ioc 容器中实现了 ioc.Closer 接口的对象
 	return ioc.Container.Close()
 }
+
+// func (a *App) Shutdown(ctx context.Context) error {
+// 	eg, c := errgroup.WithContext(ctx)
+
+// 	// 关闭 servers
+// 	for _, svr := range a.servers {
+// 		svr := svr
+// 		eg.Go(func() error {
+// 			shutdownCtx, cancel := context.WithTimeout(c, a.shutdownTimeout)
+// 			defer cancel()
+
+// 			return svr.Shutdown(shutdownCtx)
+// 		})
+// 	}
+
+// 	// 等待所有 servers 关闭
+// 	if err := eg.Wait(); err != nil {
+// 		return err
+// 	}
+
+// 	// 关闭 ioc 容器中实现了 ioc.Closer 接口的对象
+// 	return ioc.Container.Close()
+// }
