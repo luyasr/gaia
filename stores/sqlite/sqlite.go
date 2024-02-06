@@ -7,6 +7,7 @@ import (
 	"github.com/luyasr/gaia/ioc"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 const name = "sqlite"
@@ -66,7 +67,9 @@ func new(c *Config, s *Sqlite) (*Sqlite, error) {
 	var err error
 
 	once.Do(func() {
-		s.Client, err = gorm.Open(sqlite.Open(c.Path), &gorm.Config{})
+		s.Client, err = gorm.Open(sqlite.Open(c.Path), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.LogLevel(c.logLevel())),
+		})
 	})
 
 	return s, err
