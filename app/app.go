@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -99,8 +100,9 @@ func (a *App) Shutdown(ctx context.Context) error {
 	eg, c := errgroup.WithContext(ctx)
 
 	// 关闭 servers
-	for _, svr := range a.servers {
+	for i, svr := range a.servers {
 		svr := svr
+		fmt.Printf("shutdown server %d\nserver %v", i, svr)
 		eg.Go(func() error {
 			shutdownCtx, cancel := context.WithTimeout(c, a.shutdownTimeout)
 			defer cancel()
