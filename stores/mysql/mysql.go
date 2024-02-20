@@ -50,7 +50,7 @@ func (m *Mysql) Name() string {
 }
 
 func New(c *Config, opts ...Option) (*Mysql, error) {
-	cfg, err := c.initConfig(); 
+	cfg, err := c.initConfig()
 	if err != nil {
 		return nil, err
 	}
