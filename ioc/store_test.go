@@ -26,7 +26,7 @@ type Config struct {
 
 type Mysql struct {
 	Host string `json:"host"`
-	Port int `json:"port"`
+	Port int    `json:"port"`
 }
 
 func (c *Config) Init() error {

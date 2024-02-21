@@ -34,7 +34,7 @@ func (m *Mongo) Init() error {
 
 	mongoCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Internal("mongo", "Mongo type assertion failed, expected *Config, got %T", cfg)
+		return errors.Internal("mongo type assertion failed", "expected *Config, got %T", cfg)
 	}
 
 	rdb, err := New(mongoCfg)

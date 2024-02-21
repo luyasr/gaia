@@ -5,7 +5,7 @@ import (
 )
 
 type Config struct {
-	Broker    string `json:"brokers" default:"localhost:9092"`
+	Broker    string `json:"broker" default:"localhost:9092"`
 	Topic     string `json:"topic"`
 	Partition int    `json:"partition" default:"0"`
 	Timeout   int    `json:"timeout" default:"10"`

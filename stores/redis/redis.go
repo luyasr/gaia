@@ -32,7 +32,7 @@ func (r *Redis) Init() error {
 
 	redisCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Internal("redis", "Redis type assertion failed, expected *Config, got %T", cfg)
+		return errors.Internal("redis type assertion failed", "expected *Config, got %T", cfg)
 	}
 
 	rdb, err := New(redisCfg)
@@ -69,7 +69,7 @@ func New(c *Config, opts ...Option) (*Redis, error) {
 
 func new(c *Config, r *Redis) (*Redis, error) {
 	var err error
-	
+
 	once.Do(func() {
 		r.Client = redis.NewClient(&redis.Options{
 			Addr:     c.address(),

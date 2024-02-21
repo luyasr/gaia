@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	CallerDepth = 4
+	CallerDepth       = 4
 	FilterCallerDepth = 5
 )
 
@@ -119,5 +119,3 @@ func (l *Logger) Log(level log.Level, args ...any) {
 
 	event.Send()
 }
-
-

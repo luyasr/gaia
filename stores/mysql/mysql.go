@@ -33,7 +33,7 @@ func (m *Mysql) Init() error {
 
 	mysqlCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Internal("mysql", "Mysql type assertion failed, expected *Config, got %T", cfg)
+		return errors.Internal("mysql type assertion failed", "expected *Config, got %T", cfg)
 	}
 
 	rdb, err := New(mysqlCfg)

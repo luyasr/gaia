@@ -1,12 +1,13 @@
 package response
 
 import (
-	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
+	"github.com/luyasr/gaia/errors"
 )
 
 func TestGinJson(t *testing.T) {
@@ -25,7 +26,7 @@ func TestGinJsonWithError(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
-	GinJsonWithError(c, errors.New("test error"))
+	GinJsonWithError(c, errors.New(10000, "test error", "test reason"))
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	assert.Contains(t, w.Body.String(), `"code":400`)

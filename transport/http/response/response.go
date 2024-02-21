@@ -28,8 +28,13 @@ func GinJsonWithError(c *gin.Context, err error) {
 	defer c.Abort()
 
 	e := errors.FromError(err)
+	httpCode := int(e.Code)
 
-	c.JSON(int(e.Code), Response{
+	if http.StatusText(int(e.Code)) == "" {
+		httpCode = http.StatusInternalServerError
+	}
+
+	c.JSON(httpCode, Response{
 		Code:     int(e.Code),
 		Reason:   e.Reason,
 		Message:  e.Message,

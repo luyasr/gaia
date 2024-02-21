@@ -32,7 +32,7 @@ func (s *Sqlite) Init() error {
 
 	sqliteCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Internal("sqlite", "Sqlite type assertion failed, expected *Config, got %T", cfg)
+		return errors.Internal("sqlite type assertion failed", "expected *Config, got %T", cfg)
 	}
 
 	sqlite, err := New(sqliteCfg)

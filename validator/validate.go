@@ -67,10 +67,10 @@ func Struct(target any) error {
 
 		// Translate the validation errors.
 		var errs []string
-        for _, e := range err.(validator.ValidationErrors) {
-            errs = append(errs, e.Translate(Trans))
-        }
-        return errors.New(strings.Join(errs, "; "))
+		for _, e := range err.(validator.ValidationErrors) {
+			errs = append(errs, e.Translate(Trans))
+		}
+		return errors.New(strings.Join(errs, "; "))
 	}
 	return nil
 }

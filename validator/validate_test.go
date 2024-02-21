@@ -9,7 +9,7 @@ import (
 
 type Person struct {
 	Name string `validate:"required" label:"姓名"`
-	Age  int `validate:"required,isAdult" label:"年龄"`
+	Age  int    `validate:"required,isAdult" label:"年龄"`
 }
 
 func init() {
@@ -22,18 +22,18 @@ func isAdult(fl validator.FieldLevel) bool {
 }
 
 var registrationFunc = func(ut ut.Translator) error {
-    return ut.Add("isAdult", "{0}必须是成年人！", true) // see universal-translator for details
+	return ut.Add("isAdult", "{0}必须是成年人！", true) // see universal-translator for details
 }
 
 var translateFunc = func(ut ut.Translator, fe validator.FieldError) string {
-    t, _ := ut.T("isAdult", fe.Field())
-    return t
-} 
+	t, _ := ut.T("isAdult", fe.Field())
+	return t
+}
 
 func TestStruct(t *testing.T) {
 	p := Person{
 		// Name: "luya",
-		Age:  14,
+		Age: 14,
 	}
 	err := Struct(p)
 	if err != nil {

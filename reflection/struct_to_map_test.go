@@ -8,7 +8,7 @@ func TestStructToMap(t *testing.T) {
 	type testStruct struct {
 		Name string `json:"name"`
 		Age  *int
-		C struct {
+		C    struct {
 			Addr string `json:"addr"`
 		}
 		D int `json:"d"`

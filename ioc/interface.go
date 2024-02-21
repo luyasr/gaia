@@ -15,5 +15,5 @@ type GinIRouter interface {
 
 // Closer is a interface for close
 type Closer interface {
-    Close() error
+	Close() error
 }

@@ -33,7 +33,7 @@ func (k *Kafka) Init() error {
 
 	kafkaCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Internal("kafka", "Kafka type assertion failed, expected *Config, got %T", cfg)
+		return errors.Internal("Kafka type assertion failed", "expected *Config, got %T", cfg)
 	}
 
 	kaf, err := New(kafkaCfg)
@@ -86,7 +86,7 @@ func new(c *Config, k *Kafka) (*Kafka, error) {
 		k.Conn, err = dialer.DialContext(context.Background(), "tcp", c.Broker)
 	})
 	if err != nil {
-		return nil, errors.Internal("kafka", "failed to connect to kafka: %v", err)
+		return nil, errors.Internal("failed to connect to kafka", err.Error())
 	}
 
 	return k, nil
