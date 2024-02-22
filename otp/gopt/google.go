@@ -32,7 +32,6 @@ func init() {
 }
 
 type GoogleAuthenticator struct {
-	Secret       string `json:"secret"`
 	SecretSize   int    `json:"secret_size"`
 	ExpireSecond int    `json:"expire_second"`
 	Digits       int    `json:"digits"`
