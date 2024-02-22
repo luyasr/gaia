@@ -22,11 +22,11 @@ GA := NewGoogleAuthenticator(WithSecretSize(16), WithExpireSecond(30), WithDigit
 ```
 
 然后，你可以使用以下方法：
-GenerateSecret()：生成一个新的密钥。
-GenerateCode(secret string)：使用给定的密钥生成一个新的验证码。
-GenerateQRCode(label string, issuer string, secret string)：生成一个新的二维码（返回二维码的内容）。
-GenerateQRUrl(label string, issuer string, secret string)：生成一个新的二维码（返回二维码的 URL）。
-ValidateCode(secret, code string)：验证给定的验证码是否有效。
+- GenerateSecret()：生成一个新的密钥。
+- GenerateCode(secret string)：使用给定的密钥生成一个新的验证码。
+- GenerateQRCode(label string, issuer string, secret string)：生成一个新的二维码（返回二维码的内容）。
+- GenerateQRUrl(label string, issuer string, secret string)：生成一个新的二维码（返回二维码的 URL）。
+- ValidateCode(secret, code string)：验证给定的验证码是否有效。
 例如:
 
 ```golang
