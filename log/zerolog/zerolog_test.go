@@ -26,7 +26,6 @@ func TestNew(t *testing.T) {
 	str := "??"
 	helper.Debugf("%s", str)
 	helper.Debugw("msg", 12345, "error", errors.Internal("login failed", "incorrect account name or password").Error())
-
 	filterLogger := New(NewConsoleLogger().With().CallerWithSkipFrameCount(FilterCallerDepth).Logger())
 	filterHelper := log.NewHelper(log.NewFilter(filterLogger, log.FilterKey("password")))
 	filterHelper.Error("hello world")
