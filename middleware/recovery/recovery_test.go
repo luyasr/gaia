@@ -17,7 +17,7 @@ func TestGinRecovery(t *testing.T) {
 	router := gin.New()
 
 	// 创建一个新的日志助手
-	logger := log.NewHelper(zerolog.New(zerolog.DefaultLogger))
+	logger := log.NewHelper(zerolog.DefaultLogger)
 
 	// 创建一个新的Recovery实例
 	r := New(Logger(logger))

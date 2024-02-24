@@ -26,5 +26,5 @@ var (
 )
 
 func init() {
-	Container.SetLogger(log.NewHelper(zerolog.New(zerolog.DefaultLogger)))
+	Container.SetLogger(log.NewHelper(zerolog.DefaultLogger))
 }

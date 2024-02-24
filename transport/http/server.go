@@ -44,7 +44,7 @@ func Logger(logger *log.Helper) ServerOption {
 func NewServer(opt ...ServerOption) *Server {
 	svc := &Server{
 		server: &http.Server{},
-		log:    log.NewHelper(zerolog.New(zerolog.DefaultLogger)),
+		log:    log.NewHelper(zerolog.DefaultLogger),
 	}
 
 	for _, o := range opt {

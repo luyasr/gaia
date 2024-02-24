@@ -32,7 +32,7 @@ func Logger(logger *log.Helper) Option {
 
 func New(opts ...Option) *Recovery {
 	r := &Recovery{
-		logger: log.NewHelper(zerolog.New(zerolog.DefaultLogger)),
+		logger: log.NewHelper(zerolog.DefaultLogger),
 	}
 
 	for _, opt := range opts {

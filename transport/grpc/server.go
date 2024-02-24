@@ -37,7 +37,7 @@ func Logger(logger *log.Helper) ServerOption {
 func NewServer(opt ...ServerOption) *Server {
 	svc := &Server{
 		server: grpc.NewServer(),
-		log:    log.NewHelper(zerolog.New(zerolog.DefaultLogger)),
+		log:    log.NewHelper(zerolog.DefaultLogger),
 	}
 
 	for _, o := range opt {

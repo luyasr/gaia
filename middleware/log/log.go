@@ -22,7 +22,7 @@ func Logger(logger *log.Helper) Option {
 
 func New(opts ...Option) *Log {
 	l := &Log{
-		logger: log.NewHelper(zerolog.New(zerolog.DefaultLogger)),
+		logger: log.NewHelper(zerolog.DefaultLogger),
 	}
 
 	for _, opt := range opts {

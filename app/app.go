@@ -53,7 +53,7 @@ func New(opt ...Option) *App {
 		ctx:             context.Background(),
 		shutdownTimeout: 10 * time.Second,
 		sigs:            []os.Signal{os.Interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT},
-		log:             log.NewHelper(zerolog.New(zerolog.DefaultLogger)),
+		log:             log.NewHelper(zerolog.DefaultLogger),
 	}
 
 	for _, o := range opt {
