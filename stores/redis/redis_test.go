@@ -6,11 +6,11 @@ import (
 )
 
 func TestNewRedis(t *testing.T) {
-	config := Config{
+	config := &Config{
 		Password: "12345678",
 	}
 
-	r, err := New(&config)
+	r, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}

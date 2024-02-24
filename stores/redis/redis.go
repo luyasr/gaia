@@ -54,8 +54,8 @@ func New(c *Config, opts ...Option) (*Redis, error) {
 		return nil, err
 	}
 
-	if c.PoolSize == 0 {
-		c.PoolSize = 10 * runtime.GOMAXPROCS(0)
+	if cfg.PoolSize == 0 {
+		cfg.PoolSize = 10 * runtime.GOMAXPROCS(0)
 	}
 
 	r := &Redis{}
