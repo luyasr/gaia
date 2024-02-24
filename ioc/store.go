@@ -77,7 +77,7 @@ func (c *container) Init() error {
 			if err != nil {
 				return err
 			}
-			c.log.Infof("initialization successful for: %s in namespace: %s", ioc.name, ns.name)
+			c.log.Infof("Initialized object: %s in namespace: %s", ioc.name, ns.name)
 		}
 	}
 
@@ -85,7 +85,7 @@ func (c *container) Init() error {
 }
 
 // Get will get the object from the container
-func (c *container) Get(namespace, name string) Ioc {
+func (c *container) Get(namespace, name string) any {
 	if ns, exists := c.store[namespace]; exists {
 		if ioc, exists := ns.ioc[name]; exists {
 			return ioc.object
