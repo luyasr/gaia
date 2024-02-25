@@ -11,7 +11,7 @@ import (
 	"github.com/segmentio/kafka-go/sasl/plain"
 )
 
-const name = "kafka"
+const Name = "kafka"
 
 var once sync.Once
 
@@ -47,7 +47,7 @@ func (k *Kafka) Init() error {
 }
 
 func (k *Kafka) Name() string {
-	return name
+	return Name
 }
 
 func New(c *Config, opts ...Option) (*Kafka, error) {

@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-const name = "mysql"
+const Name = "mysql"
 
 var once sync.Once
 
@@ -46,7 +46,7 @@ func (m *Mysql) Init() error {
 }
 
 func (m *Mysql) Name() string {
-	return name
+	return Name
 }
 
 func New(c *Config, opts ...Option) (*Mysql, error) {

@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-const name = "sqlite"
+const Name = "sqlite"
 
 var once sync.Once
 
@@ -45,7 +45,7 @@ func (s *Sqlite) Init() error {
 }
 
 func (s *Sqlite) Name() string {
-	return name
+	return Name
 }
 
 func New(c *Config, opts ...Option) (*Sqlite, error) {

@@ -10,7 +10,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-const name = "redis"
+const Name = "redis"
 
 var once sync.Once
 
@@ -45,7 +45,7 @@ func (r *Redis) Init() error {
 }
 
 func (r *Redis) Name() string {
-	return name
+	return Name
 }
 
 func New(c *Config, opts ...Option) (*Redis, error) {

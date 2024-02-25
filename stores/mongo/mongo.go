@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-const name = "mongo"
+const Name = "mongo"
 
 var once sync.Once
 
@@ -47,7 +47,7 @@ func (m *Mongo) Init() error {
 }
 
 func (m *Mongo) Name() string {
-	return name
+	return Name
 }
 
 func New(c *Config, opts ...Option) (*Mongo, error) {
