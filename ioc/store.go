@@ -102,6 +102,10 @@ func (c *container) RegistryNamespace(namespace string, priority ...int) {
 		if len(priority) > 0 {
 			prio = priority[0]
 		}
+		// 用户优先级小于 0 时，将优先级设置为 0
+		if prio < userPriority {
+			prio = 0
+		}
 
 		c.store[namespace] = &ns{name: namespace, ioc: map[string]*ioc{}, priority: prio}
 		c.log.Infof("registered new namespace: %s", namespace)
@@ -124,7 +128,7 @@ func (c *container) Registry(namespace string, object Ioc, priority ...int) {
 
 // GinIRouterRegistry will registry all the GinIRouter to the gin.IRouter
 func (c *container) GinIRouterRegistry(r gin.IRouter) {
-	for _, ioc := range c.store[RouterNamespace].ioc {
+	for _, ioc := range c.store[HandlerNamespace].ioc {
 		if router, ok := ioc.object.(GinIRouter); ok {
 			router.Registry(r)
 			c.log.Infof("registered new GinIRouter: %s", ioc.name)

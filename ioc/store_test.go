@@ -42,7 +42,7 @@ func TestRegistryAndGet(t *testing.T) {
 	Container.Registry(ConfigNamespace, &Config{})
 	Container.Registry(ConfigNamespace, &mockIoc{name: "3"})
 	Container.Registry(ControllerNamespace, &mockIoc{name: "4"})
-	Container.Registry(RouterNamespace, &mockIoc{name: "5"})
+	Container.Registry(HandlerNamespace, &mockIoc{name: "5"})
 	Container.RegistryNamespace("xxxxx")
 	Container.Registry("xxxxx", &mockIoc{name: "8"}, 3)
 	Container.Registry("xxxxx", &mockIoc{name: "10"}, 4)
