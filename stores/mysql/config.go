@@ -13,13 +13,13 @@ type Config struct {
 	Password        string `json:"password"`
 	DataBase        string `json:"database"`
 	Charset         string `json:"charset" default:"utf8mb4"`
-	ParseTime       *bool  `json:"parse_time" default:"true"`
+	ParseTime       *bool  `json:"parseTime" mapstructure:"parse_time" default:"true"`
 	Loc             string `json:"loc" default:"Local"`
 	Timeout         int    `json:"timeout" default:"10"`
-	MaxIdleConns    int    `json:"max_idle_conns" default:"10"`
-	MaxOpenConns    int    `json:"max_open_conns" default:"100"`
-	ConnMaxLifetime int    `json:"conn_max_lifetime" default:"3600"`
-	LogLevel        string `json:"log_level" default:"silent"`
+	MaxIdleConns    int    `json:"maxIdleConns" mapstructure:"max_idle_conns" default:"10"`
+	MaxOpenConns    int    `json:"maxOpenConns" mapstructure:"max_open_conns" default:"100"`
+	ConnMaxLifetime int    `jsin:"connMaxLifetime" mapstructure:"conn_max_lifetime" default:"3600"`
+	LogLevel        string `json:"logLevel" mapstructure:"log_level" default:"silent"`
 }
 
 func (c *Config) address() string {

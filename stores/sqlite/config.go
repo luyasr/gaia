@@ -4,7 +4,7 @@ import "github.com/luyasr/gaia/reflection"
 
 type Config struct {
 	Path     string `json:"path" default:"sqlite.db"`
-	LogLevel string `json:"log_level" default:"silent"`
+	LogLevel string `json:"logLevel" mapstructure:"log_level" default:"silent"`
 }
 
 func (c *Config) logLevel() int {

@@ -12,7 +12,7 @@ type Config struct {
 	Password string `json:"password"`
 	DB       int    `json:"db" default:"0"`
 	Protocol int    `json:"protocol" default:"3"`
-	PoolSize int    `json:"pool_size"`
+	PoolSize int    `json:"poolSize" mapstructure:"pool_size"`
 }
 
 // address returns the address of the redis server
