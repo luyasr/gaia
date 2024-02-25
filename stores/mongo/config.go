@@ -12,7 +12,7 @@ type Config struct {
 	Username    string `json:"username" default:"root"`
 	Password    string `json:"password"`
 	Database    string `json:"database"`
-	MaxPoolSize int    `json:"maxPoolSize" mapstructure:"max_pool_size" default:"20"`
+	MaxPoolSize int    `json:"maxPoolSize" default:"20"`
 }
 
 func (c *Config) uri() string {
