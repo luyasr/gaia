@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"github.com/luyasr/gaia/errors"
@@ -13,8 +12,6 @@ import (
 )
 
 const Name = "mongo"
-
-var once sync.Once
 
 type Mongo struct {
 	Client *mongo.Client
@@ -66,17 +63,21 @@ func New(c *Config, opts ...Option) (*Mongo, error) {
 }
 
 func new(c *Config, m *Mongo) (*Mongo, error) {
+	var err error
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(c.uri()).SetServerAPIOptions(serverAPI)
 
-	var err error
-	once.Do(func() {
-		m.Client, err = mongo.Connect(context.TODO(), opts)
+	m.Client, err = mongo.Connect(context.TODO(), opts)
+	if err != nil {
+		return nil, err
+	}
 
-		err = m.ping()
-	})
+	err = m.ping()
+	if err != nil {
+		return nil, err
+	}
 
-	return m, err
+	return m, nil
 }
 
 func (m *Mongo) Close() error {

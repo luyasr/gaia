@@ -1,6 +1,8 @@
 package sqlite
 
-import "github.com/luyasr/gaia/reflection"
+import (
+	"github.com/luyasr/gaia/reflection"
+)
 
 type Config struct {
 	Path     string `json:"path" default:"sqlite.db"`

@@ -1,11 +1,11 @@
 package ioc
 
 import (
+	"github.com/luyasr/gaia/reflection"
 	"sort"
 
 	"github.com/gin-gonic/gin"
 	"github.com/luyasr/gaia/log"
-	"github.com/luyasr/gaia/reflection"
 )
 
 type container struct {

@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"fmt"
-
 	"github.com/luyasr/gaia/reflection"
 )
 

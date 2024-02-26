@@ -2,7 +2,6 @@ package redis
 
 import (
 	"fmt"
-
 	"github.com/luyasr/gaia/reflection"
 )
 

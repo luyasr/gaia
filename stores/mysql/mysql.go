@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"sync"
 	"time"
 
 	"github.com/luyasr/gaia/errors"
@@ -12,8 +11,6 @@ import (
 )
 
 const Name = "mysql"
-
-var once sync.Once
 
 type Mysql struct {
 	Client *gorm.DB
@@ -67,25 +64,23 @@ func New(c *Config, opts ...Option) (*Mysql, error) {
 func new(c *Config, m *Mysql) (*Mysql, error) {
 	var err error
 
-	once.Do(func() {
-		m.Client, err = gorm.Open(mysql.Open(c.dsn()), &gorm.Config{
-			Logger: logger.Default.LogMode(logger.LogLevel(c.logLevel())),
-		})
-		if err != nil {
-			return
-		}
-
-		sqlDB, err := m.Client.DB()
-		if err != nil {
-			return
-		}
-
-		sqlDB.SetMaxIdleConns(c.MaxIdleConns)
-		sqlDB.SetMaxOpenConns(c.MaxOpenConns)
-		sqlDB.SetConnMaxLifetime(time.Duration(c.ConnMaxLifetime))
+	m.Client, err = gorm.Open(mysql.Open(c.dsn()), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.LogLevel(c.logLevel())),
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	return m, err
+	sqlDB, err := m.Client.DB()
+	if err != nil {
+		return nil, err
+	}
+
+	sqlDB.SetMaxIdleConns(c.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(c.MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(time.Duration(c.ConnMaxLifetime))
+
+	return m, nil
 }
 
 func (m *Mysql) Close() error {

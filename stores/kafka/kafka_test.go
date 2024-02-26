@@ -4,7 +4,7 @@ import "testing"
 
 func TestNew(t *testing.T) {
 	c := Config{
-		Broker:    "localhost:9092",
+		Brokers:   "localhost:9092",
 		Topic:     "test",
 		Partition: 0,
 		Timeout:   10,

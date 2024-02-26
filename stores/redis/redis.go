@@ -3,7 +3,6 @@ package redis
 import (
 	"context"
 	"runtime"
-	"sync"
 
 	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/ioc"
@@ -11,8 +10,6 @@ import (
 )
 
 const Name = "redis"
-
-var once sync.Once
 
 type Redis struct {
 	Client *redis.Client
@@ -68,19 +65,15 @@ func New(c *Config, opts ...Option) (*Redis, error) {
 }
 
 func new(c *Config, r *Redis) (*Redis, error) {
-	var err error
-
-	once.Do(func() {
-		r.Client = redis.NewClient(&redis.Options{
-			Addr:     c.address(),
-			Password: c.Password,
-			DB:       c.DB,
-			Protocol: c.Protocol,
-			PoolSize: c.PoolSize,
-		})
-
-		_, err = r.Client.Ping(context.Background()).Result()
+	r.Client = redis.NewClient(&redis.Options{
+		Addr:     c.address(),
+		Password: c.Password,
+		DB:       c.DB,
+		Protocol: c.Protocol,
+		PoolSize: c.PoolSize,
 	})
+
+	_, err := r.Client.Ping(context.Background()).Result()
 
 	return r, err
 }

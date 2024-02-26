@@ -13,10 +13,10 @@ import (
 
 const Name = "kafka"
 
-var once sync.Once
-
 type Kafka struct {
-	Conn *kafka.Conn
+	Conn   *kafka.Conn
+	Reader *kafka.Reader
+	Writer *kafka.Writer
 }
 
 type Option func(*Kafka)
@@ -40,7 +40,8 @@ func (k *Kafka) Init() error {
 	if err != nil {
 		return err
 	}
-	k.Conn = kaf.Conn
+	k.Reader = kaf.Reader
+	k.Writer = kaf.Writer
 
 	return nil
 
@@ -75,27 +76,55 @@ func new(c *Config, k *Kafka) (*Kafka, error) {
 		Timeout:   time.Duration(c.Timeout) * time.Second,
 		DualStack: true,
 	}
+	sharedTransport := &kafka.Transport{}
 
 	// if username and password are provided, use SASL
 	if c.Username != "" && c.Password != "" {
 		dialer.SASLMechanism = mechanism
+		sharedTransport.SASL = mechanism
 	}
 
 	var err error
-	once.Do(func() {
-		k.Conn, err = dialer.DialContext(context.Background(), "tcp", c.Broker)
-	})
+	k.Conn, err = kafka.DialContext(context.Background(), "tcp", c.BrokerSlice()[0])
 	if err != nil {
-		return nil, errors.Internal("failed to connect to kafka", err.Error())
+		return nil, err
+	}
+
+	k.Reader = kafka.NewReader(kafka.ReaderConfig{
+		Brokers:   c.BrokerSlice(),
+		Topic:     c.Topic,
+		Partition: 0,
+		MinBytes:  10e3, // 10KB
+		MaxBytes:  10e6, // 10MB
+		Dialer:    dialer,
+	})
+
+	k.Writer = &kafka.Writer{
+		Addr:      kafka.TCP(c.BrokerSlice()...),
+		Topic:     c.Topic,
+		Balancer:  &kafka.Hash{},
+		Transport: sharedTransport,
 	}
 
 	return k, nil
 }
 
 func (k *Kafka) Close() error {
-	if k.Conn != nil {
-		return k.Conn.Close()
+	var wg sync.WaitGroup
+	var err error
+
+	closeAndCatch := func(closer func() error) {
+		defer wg.Done()
+		if cerr := closer(); cerr != nil {
+			err = cerr
+		}
 	}
 
-	return nil
+	wg.Add(3)
+	go closeAndCatch(k.Conn.Close)
+	go closeAndCatch(k.Reader.Close)
+	go closeAndCatch(k.Writer.Close)
+	wg.Wait()
+
+	return err
 }

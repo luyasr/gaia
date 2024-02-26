@@ -1,16 +1,23 @@
 package kafka
 
 import (
+	"strings"
+
 	"github.com/luyasr/gaia/reflection"
 )
 
 type Config struct {
-	Broker    string `json:"broker" default:"localhost:9092"`
+	Brokers   string `json:"brokers" default:"localhost:9092"`
 	Topic     string `json:"topic"`
 	Partition int    `json:"partition" default:"0"`
 	Timeout   int    `json:"timeout" default:"10"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`
+}
+
+func (c *Config) BrokerSlice() []string {
+	noSpaces := strings.ReplaceAll(c.Brokers, " ", "")
+	return strings.Split(noSpaces, ",")
 }
 
 func (c *Config) initConfig() (*Config, error) {

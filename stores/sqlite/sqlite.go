@@ -1,8 +1,6 @@
 package sqlite
 
 import (
-	"sync"
-
 	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/ioc"
 	"gorm.io/driver/sqlite"
@@ -11,8 +9,6 @@ import (
 )
 
 const Name = "sqlite"
-
-var once sync.Once
 
 type Sqlite struct {
 	Client *gorm.DB
@@ -66,10 +62,8 @@ func New(c *Config, opts ...Option) (*Sqlite, error) {
 func new(c *Config, s *Sqlite) (*Sqlite, error) {
 	var err error
 
-	once.Do(func() {
-		s.Client, err = gorm.Open(sqlite.Open(c.Path), &gorm.Config{
-			Logger: logger.Default.LogMode(logger.LogLevel(c.logLevel())),
-		})
+	s.Client, err = gorm.Open(sqlite.Open(c.Path), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.LogLevel(c.logLevel())),
 	})
 
 	return s, err
