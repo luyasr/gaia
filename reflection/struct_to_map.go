@@ -4,6 +4,10 @@ import (
 	"reflect"
 )
 
+type Config struct {
+	IgnoreEmpty bool
+}
+
 // StructToMap converts a struct to a map using reflection.
 // If you want to remove default zero values, you can use pointer types in the struct.
 func StructToMap(obj any) map[string]any {

@@ -67,6 +67,8 @@ func New(c *Config, opts ...Option) (*Kafka, error) {
 }
 
 func new(c *Config, k *Kafka) (*Kafka, error) {
+	ctx := context.Background()
+
 	mechanism := plain.Mechanism{
 		Username: c.Username,
 		Password: c.Password,
@@ -85,7 +87,7 @@ func new(c *Config, k *Kafka) (*Kafka, error) {
 	}
 
 	var err error
-	k.Conn, err = kafka.DialContext(context.Background(), "tcp", c.BrokerSlice()[0])
+	k.Conn, err = kafka.DialContext(ctx, "tcp", c.BrokerSlice()[0])
 	if err != nil {
 		return nil, err
 	}
@@ -113,17 +115,19 @@ func (k *Kafka) Close() error {
 	var wg sync.WaitGroup
 	var err error
 
-	closeAndCatch := func(closer func() error) {
+	close := func(closer func() error) {
 		defer wg.Done()
-		if cerr := closer(); cerr != nil {
-			err = cerr
+		if closer != nil {
+			if cerr := closer(); cerr != nil {
+				err = cerr
+			}
 		}
 	}
 
 	wg.Add(3)
-	go closeAndCatch(k.Conn.Close)
-	go closeAndCatch(k.Reader.Close)
-	go closeAndCatch(k.Writer.Close)
+	go close(k.Conn.Close)
+	go close(k.Reader.Close)
+	go close(k.Writer.Close)
 	wg.Wait()
 
 	return err
