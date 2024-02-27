@@ -2,7 +2,6 @@ package kafka
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/luyasr/gaia/ioc"
@@ -14,8 +13,6 @@ import (
 
 const Name = "kafka"
 
-var config any
-
 type Kafka struct {
 	Conn   *kafka.Conn
 	Reader *kafka.Reader
@@ -25,21 +22,18 @@ type Kafka struct {
 type Option func(*Kafka)
 
 func init() {
-	var ok bool
-	config, ok = ioc.Container.GetFieldValueByConfig("Kafka")
-	if !ok {
-		return
-	}
-	fmt.Println("config", config)
-	if config != nil {
-		ioc.Container.Registry(ioc.DbNamespace, &Kafka{})
-	}
+	ioc.Container.Registry(ioc.DbNamespace, &Kafka{})
 }
 
 func (k *Kafka) Init() error {
-	kafkaCfg, ok := config.(*Config)
+	cfg, ok := ioc.Container.GetFieldValueByConfig("Kafka")
 	if !ok {
-		return errors.Wrapf(errors.New("Kafka type assertion failed"), "expected *Config, got %T", config)
+		return nil
+	}
+
+	kafkaCfg, ok := cfg.(*Config)
+	if !ok {
+		return errors.Wrapf(errors.New("Kafka type assertion failed"), "expected *Config, got %T", cfg)
 	}
 
 	kaf, err := New(kafkaCfg)
