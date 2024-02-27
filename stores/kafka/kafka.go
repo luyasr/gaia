@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/luyasr/gaia/ioc"
@@ -29,15 +30,13 @@ func init() {
 	if !ok {
 		return
 	}
+	fmt.Println("config", config)
 	if config != nil {
 		ioc.Container.Registry(ioc.DbNamespace, &Kafka{})
 	}
 }
 
 func (k *Kafka) Init() error {
-	if config == nil {
-		return errors.Wrap(errors.New("Kafka config is nil"), "if you are using Kafka, make sure to provide a config in the config file")
-	}
 	kafkaCfg, ok := config.(*Config)
 	if !ok {
 		return errors.Wrapf(errors.New("Kafka type assertion failed"), "expected *Config, got %T", config)
