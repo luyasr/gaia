@@ -2,16 +2,18 @@ package kafka
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/ioc"
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/sasl/plain"
+	"golang.org/x/sync/errgroup"
 )
 
 const Name = "kafka"
+
+var config any
 
 type Kafka struct {
 	Conn   *kafka.Conn
@@ -22,18 +24,20 @@ type Kafka struct {
 type Option func(*Kafka)
 
 func init() {
-	ioc.Container.Registry(ioc.DbNamespace, &Kafka{})
+	var ok bool
+	config, ok = ioc.Container.GetFieldValueByConfig("Kafka")
+	if !ok {
+		return
+	}
+	if config != nil {
+		ioc.Container.Registry(ioc.DbNamespace, &Kafka{})
+	}
 }
 
 func (k *Kafka) Init() error {
-	cfg, ok := ioc.Container.GetFieldValueByConfig("Kafka")
+	kafkaCfg, ok := config.(*Config)
 	if !ok {
-		return nil
-	}
-
-	kafkaCfg, ok := cfg.(*Config)
-	if !ok {
-		return errors.Internal("Kafka type assertion failed", "expected *Config, got %T", cfg)
+		return errors.Internal("Kafka type assertion failed", "expected *Config, got %T", config)
 	}
 
 	kaf, err := New(kafkaCfg)
@@ -113,23 +117,20 @@ func new(c *Config, k *Kafka) (*Kafka, error) {
 }
 
 func (k *Kafka) Close() error {
-	var wg sync.WaitGroup
-	var err error
+	var eg errgroup.Group
 
 	close := func(closer func() error) {
-		defer wg.Done()
-		if closer != nil {
-			if cerr := closer(); cerr != nil {
-				err = cerr
+		eg.Go(func() error {
+			if closer != nil {
+				return closer()
 			}
-		}
+			return nil
+		})
 	}
 
-	wg.Add(3)
-	go close(k.Conn.Close)
-	go close(k.Reader.Close)
-	go close(k.Writer.Close)
-	wg.Wait()
+	close(k.Conn.Close)
+	close(k.Reader.Close)
+	close(k.Writer.Close)
 
-	return err
+	return eg.Wait()
 }
