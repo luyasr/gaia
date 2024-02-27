@@ -81,11 +81,11 @@ func new(c *Config, m *Mongo) (*Mongo, error) {
 }
 
 func (m *Mongo) Close() error {
-	if m.Client != nil {
-		return m.Client.Disconnect(context.TODO())
+	if m.Client == nil {
+		return nil
 	}
 
-	return nil
+	return m.Client.Disconnect(context.TODO())
 }
 
 func (m *Mongo) ping() error {

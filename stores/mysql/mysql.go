@@ -84,6 +84,9 @@ func new(c *Config, m *Mysql) (*Mysql, error) {
 }
 
 func (m *Mysql) Close() error {
+	if m.Client == nil {
+		return nil
+	}
 	sqlDB, err := m.Client.DB()
 	if err != nil {
 		return err

@@ -79,5 +79,9 @@ func new(c *Config, r *Redis) (*Redis, error) {
 }
 
 func (r *Redis) Close() error {
+	if r.Client == nil {
+		return nil
+	}
+	
 	return r.Client.Close()
 }

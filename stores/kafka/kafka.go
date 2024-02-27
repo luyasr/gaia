@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/ioc"
-	"github.com/pkg/errors"
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/sasl/plain"
 	"golang.org/x/sync/errgroup"
@@ -33,7 +33,7 @@ func (k *Kafka) Init() error {
 
 	kafkaCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Wrapf(errors.New("Kafka type assertion failed"), "expected *Config, got %T", cfg)
+		return errors.Internal("kafka type assertion failed", "expected *Config, got %T", cfg)
 	}
 
 	kaf, err := New(kafkaCfg)

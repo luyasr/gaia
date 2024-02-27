@@ -70,6 +70,10 @@ func new(c *Config, s *Sqlite) (*Sqlite, error) {
 }
 
 func (s *Sqlite) Close() error {
+	if s.Client == nil {
+		return nil
+	}
+	
 	db, err := s.Client.DB()
 	if err != nil {
 		return err
