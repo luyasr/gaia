@@ -40,6 +40,7 @@ func (k *Kafka) Init() error {
 	if err != nil {
 		return err
 	}
+	k.Conn = kaf.Conn
 	k.Reader = kaf.Reader
 	k.Writer = kaf.Writer
 
