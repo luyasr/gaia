@@ -24,12 +24,12 @@ func init() {
 func (r *Redis) Init() error {
 	cfg, ok := ioc.Container.GetFieldValueByConfig("Redis")
 	if !ok {
-		return nil
+		return errors.Internal("redis config not found", "expected *Config, got %T", cfg)
 	}
 
 	redisCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Internal("redis type assertion failed", "expected *Config, got %T", cfg)
+		return errors.Internal("redis config type assertion failed", "expected *Config, got %T", cfg)
 	}
 
 	rdb, err := New(redisCfg)
@@ -82,6 +82,6 @@ func (r *Redis) Close() error {
 	if r.Client == nil {
 		return nil
 	}
-	
+
 	return r.Client.Close()
 }

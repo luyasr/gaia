@@ -23,12 +23,12 @@ func init() {
 func (s *Sqlite) Init() error {
 	cfg, ok := ioc.Container.GetFieldValueByConfig("Sqlite")
 	if !ok {
-		return nil
+		return errors.Internal("sqlite config not found", "expected *Config, got %T", cfg)
 	}
 
 	sqliteCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Internal("sqlite type assertion failed", "expected *Config, got %T", cfg)
+		return errors.Internal("sqlite config type assertion failed", "expected *Config, got %T", cfg)
 	}
 
 	sqlite, err := New(sqliteCfg)
@@ -73,7 +73,7 @@ func (s *Sqlite) Close() error {
 	if s.Client == nil {
 		return nil
 	}
-	
+
 	db, err := s.Client.DB()
 	if err != nil {
 		return err

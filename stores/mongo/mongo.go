@@ -26,12 +26,12 @@ func init() {
 func (m *Mongo) Init() error {
 	cfg, ok := ioc.Container.GetFieldValueByConfig("Mongo")
 	if !ok {
-		return nil
+		return errors.Internal("mongo config not found", "expected *Config, got %T", cfg)
 	}
 
 	mongoCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Internal("mongo type assertion failed", "expected *Config, got %T", cfg)
+		return errors.Internal("mongo config type assertion failed", "expected *Config, got %T", cfg)
 	}
 
 	rdb, err := New(mongoCfg)

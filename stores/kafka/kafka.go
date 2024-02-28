@@ -1,22 +1,20 @@
 package kafka
 
 import (
-	"context"
 	"time"
 
 	"github.com/luyasr/gaia/errors"
 	"github.com/luyasr/gaia/ioc"
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/sasl/plain"
-	"golang.org/x/sync/errgroup"
 )
 
 const Name = "kafka"
 
 type Kafka struct {
-	Conn   *kafka.Conn
-	Reader *kafka.Reader
-	Writer *kafka.Writer
+	config    *Config
+	dialer    *kafka.Dialer
+	transport *kafka.Transport
 }
 
 type Option func(*Kafka)
@@ -26,107 +24,83 @@ func init() {
 }
 
 func (k *Kafka) Init() error {
+	var err error
 	cfg, ok := ioc.Container.GetFieldValueByConfig("Kafka")
 	if !ok {
-		return nil
+		return errors.Internal("kafka config not found", "expected *Config, got %T", cfg)
 	}
 
 	kafkaCfg, ok := cfg.(*Config)
 	if !ok {
-		return errors.Internal("kafka type assertion failed", "expected *Config, got %T", cfg)
+		return errors.Internal("kafka config type assertion failed", "expected *Config, got %T", cfg)
 	}
 
-	kaf, err := New(kafkaCfg)
+	k.config, err = kafkaCfg.initConfig()
 	if err != nil {
-		return err
+		return errors.Internal("kafka config init failed", err.Error())
 	}
-	k.Conn = kaf.Conn
-	k.Reader = kaf.Reader
-	k.Writer = kaf.Writer
+
+	// set up SASL
+	k.sasl()
 
 	return nil
-
 }
 
 func (k *Kafka) Name() string {
 	return Name
 }
 
-func New(c *Config, opts ...Option) (*Kafka, error) {
-	cfg, err := c.initConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	k := &Kafka{}
-
-	for _, opt := range opts {
-		opt(k)
-	}
-
-	return new(cfg, k)
-}
-
-func new(c *Config, k *Kafka) (*Kafka, error) {
-	ctx := context.Background()
-
+func (k *Kafka) sasl() {
 	mechanism := plain.Mechanism{
-		Username: c.Username,
-		Password: c.Password,
+		Username: k.config.Username,
+		Password: k.config.Password,
 	}
 
 	dialer := &kafka.Dialer{
-		Timeout:   time.Duration(c.Timeout) * time.Second,
+		Timeout:   time.Duration(k.config.Timeout) * time.Second,
 		DualStack: true,
 	}
 	sharedTransport := &kafka.Transport{}
 
 	// if username and password are provided, use SASL
-	if c.Username != "" && c.Password != "" {
+	if k.config.Username != "" && k.config.Password != "" {
 		dialer.SASLMechanism = mechanism
 		sharedTransport.SASL = mechanism
 	}
 
-	var err error
-	k.Conn, err = kafka.DialContext(ctx, "tcp", c.BrokerSlice()[0])
-	if err != nil {
-		return nil, err
-	}
-
-	k.Reader = kafka.NewReader(kafka.ReaderConfig{
-		Brokers:   c.BrokerSlice(),
-		Topic:     c.Topic,
-		Partition: 0,
-		MinBytes:  10e3, // 10KB
-		MaxBytes:  10e6, // 10MB
-		Dialer:    dialer,
-	})
-
-	k.Writer = &kafka.Writer{
-		Addr:      kafka.TCP(c.BrokerSlice()...),
-		Topic:     c.Topic,
-		Balancer:  &kafka.Hash{},
-		Transport: sharedTransport,
-	}
-
-	return k, nil
+	k.dialer = dialer
+	k.transport = sharedTransport
 }
 
-func (k *Kafka) Close() error {
-	var eg errgroup.Group
-
-	close := func(closer func() error) {
-		eg.Go(func() error {
-			if closer != nil {
-				return closer()
-			}
-			return nil
-		})
+func (k *Kafka) NewProducer(topic string) *kafka.Writer {
+	return &kafka.Writer{
+		Addr:                   kafka.TCP(k.config.Brokers),
+		Topic:                  topic,
+		Balancer:               k.config.setBalancer(),
+		AllowAutoTopicCreation: k.config.AllowAutoTopicCreation,
+		Transport:              k.transport,
 	}
+}
 
-	close(k.Conn.Close)
-	close(k.Reader.Close)
-	close(k.Writer.Close)
+func (k *Kafka) NewConsumer(topic string) *kafka.Reader {
+	return kafka.NewReader(kafka.ReaderConfig{
+		Brokers:   k.config.setBrokers(),
+		Topic:     topic,
+		Partition: k.config.Partition,
+		MinBytes:  k.config.MinBytes, // 10KB
+		MaxBytes:  k.config.MaxBytes, // 10MB
+		Dialer:    k.dialer,
+	})
+}
 
-	return eg.Wait()
+func (k *Kafka) NewConsumerGroup(topic, groupID string) *kafka.Reader {
+	return kafka.NewReader(kafka.ReaderConfig{
+		Brokers:   k.config.setBrokers(),
+		GroupID:   groupID,
+		Topic:     topic,
+		Partition: k.config.Partition,
+		MinBytes:  k.config.MinBytes, // 10KB
+		MaxBytes:  k.config.MaxBytes, // 10MB
+		Dialer:    k.dialer,
+	})
 }
