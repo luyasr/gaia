@@ -40,17 +40,17 @@ func SetDefaultTag(obj any) error {
 			case reflect.String:
 				vFiled.SetString(tag)
 			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-				parseInt, err := strconv.ParseInt(tag, 10, 64)
+				parseFloat, err := strconv.ParseFloat(tag, 64)
 				if err != nil {
 					return errors.Internal(reason, "error parsing int: %s", err)
 				}
-				vFiled.SetInt(parseInt)
+				vFiled.SetInt(int64(parseFloat))
 			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-				parseUint, err := strconv.ParseUint(tag, 10, 64)
+				parseFloat, err := strconv.ParseFloat(tag, 64)
 				if err != nil {
 					return errors.Internal(reason, "error parsing uint: %s", err)
 				}
-				vFiled.SetUint(parseUint)
+				vFiled.SetUint(uint64(parseFloat))
 			case reflect.Float32, reflect.Float64:
 				parseFloat, err := strconv.ParseFloat(tag, 64)
 				if err != nil {
