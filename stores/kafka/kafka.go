@@ -27,7 +27,7 @@ func (k *Kafka) Init() error {
 	var err error
 	cfg, ok := ioc.Container.GetFieldValueByConfig("Kafka")
 	if !ok {
-		return errors.Internal("kafka config not found", "expected *Config, got %T", cfg)
+		return nil
 	}
 
 	kafkaCfg, ok := cfg.(*Config)

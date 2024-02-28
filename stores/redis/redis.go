@@ -24,7 +24,7 @@ func init() {
 func (r *Redis) Init() error {
 	cfg, ok := ioc.Container.GetFieldValueByConfig("Redis")
 	if !ok {
-		return errors.Internal("redis config not found", "expected *Config, got %T", cfg)
+		return nil
 	}
 
 	redisCfg, ok := cfg.(*Config)

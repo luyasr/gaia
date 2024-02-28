@@ -25,7 +25,7 @@ func init() {
 func (m *Mysql) Init() error {
 	cfg, ok := ioc.Container.GetFieldValueByConfig("Mysql")
 	if !ok {
-		return errors.Internal("mysql config not found", "expected *Config, got %T", cfg)
+		return nil
 	}
 
 	mysqlCfg, ok := cfg.(*Config)

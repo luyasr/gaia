@@ -26,7 +26,7 @@ func init() {
 func (m *Mongo) Init() error {
 	cfg, ok := ioc.Container.GetFieldValueByConfig("Mongo")
 	if !ok {
-		return errors.Internal("mongo config not found", "expected *Config, got %T", cfg)
+		return nil
 	}
 
 	mongoCfg, ok := cfg.(*Config)

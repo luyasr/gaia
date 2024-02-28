@@ -23,7 +23,7 @@ func init() {
 func (s *Sqlite) Init() error {
 	cfg, ok := ioc.Container.GetFieldValueByConfig("Sqlite")
 	if !ok {
-		return errors.Internal("sqlite config not found", "expected *Config, got %T", cfg)
+		return nil
 	}
 
 	sqliteCfg, ok := cfg.(*Config)
