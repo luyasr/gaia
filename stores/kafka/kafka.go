@@ -82,6 +82,17 @@ func (k *Kafka) NewProducer(topic string) *kafka.Writer {
 	}
 }
 
+func (k *Kafka) NewAsyncProducer(topic string) *kafka.Writer {
+	return &kafka.Writer{
+		Addr:                   kafka.TCP(k.config.Brokers),
+		Topic:                  topic,
+		Balancer:               k.config.setBalancer(),
+		AllowAutoTopicCreation: k.config.AllowAutoTopicCreation,
+		Transport:              k.transport,
+		Async:                  true,
+	}
+}
+
 func (k *Kafka) NewConsumer(topic string) *kafka.Reader {
 	return kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   k.config.setBrokers(),

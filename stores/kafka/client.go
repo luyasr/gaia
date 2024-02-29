@@ -9,6 +9,10 @@ func Producer(topic string) *kafka.Writer {
 	return ioc.Container.Get(ioc.DbNamespace, Name).(*Kafka).NewProducer(topic)
 }
 
+func AsyncProducer(topic string) *kafka.Writer {
+	return ioc.Container.Get(ioc.DbNamespace, Name).(*Kafka).NewAsyncProducer(topic)
+}
+
 func Consumer(topic string) *kafka.Reader {
 	return ioc.Container.Get(ioc.DbNamespace, Name).(*Kafka).NewConsumer(topic)
 }
