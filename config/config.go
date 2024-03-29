@@ -1,9 +1,11 @@
 package config
 
 import (
-	"github.com/luyasr/gaia/reflection"
 	"path/filepath"
 	"strings"
+
+	"github.com/luyasr/gaia/log/zerolog"
+	"github.com/luyasr/gaia/reflection"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/luyasr/gaia/errors"
@@ -21,6 +23,7 @@ type Interface interface {
 type Config struct {
 	filepath string
 	target   any
+	log      *log.Helper
 	parsedPath
 }
 
@@ -33,6 +36,13 @@ type parsedPath struct {
 
 type Option func(*Config)
 
+// WithLogger creates an Option that sets the logger for the config.
+func WithLogger(logger log.Logger) Option {
+	return func(cfg *Config) {
+		cfg.log = log.NewHelper(logger)
+	}
+}
+
 // LoadFile creates an Option that loads the config from the given path into the given object.
 func LoadFile(filepath string, configObject any) Option {
 	return func(cfg *Config) {
@@ -44,7 +54,9 @@ func LoadFile(filepath string, configObject any) Option {
 
 // New creates a new config with the given options.
 func New(opts ...Option) (*Config, error) {
-	cfg := &Config{}
+	cfg := &Config{
+		log: log.NewHelper(zerolog.DefaultLogger),
+	}
 
 	for _, opt := range opts {
 		opt(cfg)
@@ -89,7 +101,7 @@ func (cfg *Config) Read() error {
 func (cfg *Config) Watch() error {
 	errCh := make(chan error, 1)
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		log.Infof("Config file changed: %s", e.Name)
+		cfg.log.Infof("Config file changed: %s", e.Name)
 		if err := viper.Unmarshal(&cfg.target); err != nil {
 			errCh <- err
 		}
