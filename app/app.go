@@ -103,5 +103,10 @@ func (a *App) Run() error {
 		return err
 	}
 
-	return ioc.Container.Close()
+	// close ioc container
+	if err := ioc.Container.Close(); err != nil {
+		return err
+	}	
+
+	return nil
 }

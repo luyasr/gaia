@@ -21,9 +21,10 @@ type Interface interface {
 
 // Config represents a configuration with a filepath and a target object.
 type Config struct {
+	log      *log.Helper
+	
 	filepath string
 	target   any
-	log      *log.Helper
 	parsedPath
 }
 
