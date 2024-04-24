@@ -101,7 +101,7 @@ func (c *container) RegistryNamespace(namespace string, priority ...int) {
 		if len(priority) > 0 {
 			prio = priority[0]
 		}
-		// 用户优先级小于 0 时，将优先级设置为 0
+		// priority should be 0 if it's less than the user priority
 		if prio < userPriority {
 			prio = 0
 		}
@@ -136,7 +136,7 @@ func (c *container) GinIRouterRegistry(r gin.IRouter) {
 }
 
 // Close will close all the ioc.Closer
-// 倒序关闭所有实现了 ioc.Closer 的对象
+// It will close the ioc in the reverse order
 func (c *container) Close() error {
 	c.reverse()
 	for _, ns := range c.sorted {

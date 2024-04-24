@@ -11,10 +11,6 @@ import (
 
 var _ Logger = (*Slog)(nil)
 
-const (
-	callerDepth = 4
-)
-
 type Slog struct {
 	logger *slog.Logger
 }
@@ -68,6 +64,7 @@ func caller(depth int) string {
 }
 
 func (s *Slog) log(level Level, msg string, args ...any) {
+	callerDepth := CallerDepth(2)
 	switch level {
 	case LevelDebug:
 		s.logger.With("caller", caller(callerDepth)).Debug(msg, args...)

@@ -15,9 +15,9 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-const (
-	CallerDepth       = 4
-	FilterCallerDepth = 5
+var (
+	CallerDepth       = log.CallerDepth(1)
+	FilterCallerDepth = log.CallerDepth(0)
 )
 
 var _ log.Logger = (*Logger)(nil)
