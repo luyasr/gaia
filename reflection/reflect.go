@@ -22,3 +22,24 @@ func GetFieldValue(structure any, fieldName string) (any, bool) {
 	}
 	return field.Interface(), true
 }
+
+func GetFieldValueByType(structure any, fieldType reflect.Type) map[string]any {
+	v := reflect.ValueOf(structure)
+	fields := make(map[string]any)
+
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	if v.Kind() != reflect.Struct {
+		return fields
+	}
+
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		if field.Type() == fieldType {
+			fields[v.Type().Field(i).Name] = field.Interface()
+		}
+	}
+
+	return fields
+}
