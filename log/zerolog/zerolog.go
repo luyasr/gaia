@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	CallerDepth       = log.CallerDepth(1)
-	FilterCallerDepth = log.CallerDepth(0)
+	CallerDepth       = 4
+	FilterCallerDepth = 5
 )
 
 var _ log.Logger = (*Logger)(nil)
@@ -38,11 +38,27 @@ func init() {
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 }
 
+// With creates an option with the given logger
+func SetCallerDepth(depth int) {
+	CallerDepth = depth
+}
+
+// With creates an option with the given logger
+func SetFilterCallerDepth(depth int) {
+	FilterCallerDepth = depth
+}
+
 // New creates a new logger with Logger
-func New(logger zerolog.Logger) *Logger {
-	return &Logger{
+func New(logger zerolog.Logger, opt ...Option) *Logger {
+	l := &Logger{
 		log: logger,
 	}
+
+	for _, o := range opt {
+		o(l)
+	}
+
+	return l
 }
 
 // console format the output

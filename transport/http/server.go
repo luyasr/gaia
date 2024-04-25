@@ -41,10 +41,19 @@ func Logger(logger *log.Helper) ServerOption {
 	}
 }
 
+func Route(pattern string, handler http.HandlerFunc) ServerOption {
+	return func(s *Server) {
+		s.server.Handler.(*http.ServeMux).HandleFunc(pattern, handler)
+	}
+}
+
 func NewServer(opt ...ServerOption) *Server {
 	svc := &Server{
-		server: &http.Server{},
-		log:    log.NewHelper(zerolog.DefaultLogger),
+		server: &http.Server{
+			Addr:    defaultAddress,
+			Handler: http.DefaultServeMux,
+		},
+		log: log.NewHelper(zerolog.DefaultLogger),
 	}
 
 	for _, o := range opt {

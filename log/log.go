@@ -4,6 +4,8 @@ import (
 	"log/slog"
 	"os"
 	"runtime"
+	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -29,7 +31,7 @@ func CallerDepth(skip int) int {
 	// Ask runtime.Callers for up to 10 pcs, including runtime.Callers itself.
 	// skip = 0 means runtime.Callers; skip = 1 means the caller of runtime.Callers; etc.
 	pc := make([]uintptr, 10)
-	n := runtime.Callers(skip + 1, pc)
+	n := runtime.Callers(skip+1, pc)
 	if n == 0 {
 		return 0
 	}
@@ -48,4 +50,15 @@ func CallerDepth(skip int) int {
 		frameCount++
 	}
 	return frameCount
+}
+
+// Caller returns the caller of the function that called it.
+func Caller(depth int) string {
+	_, file, line, _ := runtime.Caller(depth)
+	idx := strings.LastIndexByte(file, '/')
+	if idx == -1 {
+		return file[idx+1:] + ":" + strconv.Itoa(line)
+	}
+	idx = strings.LastIndexByte(file[:idx], '/')
+	return file[idx+1:] + ":" + strconv.Itoa(line)
 }

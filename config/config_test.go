@@ -2,6 +2,7 @@ package config
 
 import (
 	"testing"
+	"time"
 )
 
 type conf struct {
@@ -29,4 +30,5 @@ func TestConfig_Load(t *testing.T) {
 	}
 
 	t.Log(cfg)
+	time.Sleep(30 * time.Second)
 }

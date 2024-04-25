@@ -3,23 +3,39 @@ package log
 import (
 	"context"
 	"log/slog"
-	"runtime"
-	"strconv"
-	"strings"
 	"time"
 )
 
 var _ Logger = (*Slog)(nil)
 
+const (
+	defaultCallerDepth = 4
+)
+
 type Slog struct {
-	logger *slog.Logger
+	logger            *slog.Logger
+	callerDepth       int
+	filterCallerDepth int
 }
 
 type SlogOption func(*Slog)
 
+func WithCallerDepth(depth int) SlogOption {
+	return func(s *Slog) {
+		s.callerDepth = depth
+	}
+}
+
+func WithFilterCallerDepth(depth int) SlogOption {
+	return func(s *Slog) {
+		s.filterCallerDepth = depth
+	}
+}
+
 func NewSlog(logger *slog.Logger, opts ...SlogOption) *Slog {
 	slog := &Slog{
-		logger: logger,
+		logger:      logger,
+		callerDepth: defaultCallerDepth,
 	}
 
 	for _, opt := range opts {
@@ -52,30 +68,18 @@ func HandlerOptions() *slog.HandlerOptions {
 	}
 }
 
-// Caller returns the caller of the function that called it.
-func caller(depth int) string {
-	_, file, line, _ := runtime.Caller(depth)
-	idx := strings.LastIndexByte(file, '/')
-	if idx == -1 {
-		return file[idx+1:] + ":" + strconv.Itoa(line)
-	}
-	idx = strings.LastIndexByte(file[:idx], '/')
-	return file[idx+1:] + ":" + strconv.Itoa(line)
-}
-
 func (s *Slog) log(level Level, msg string, args ...any) {
-	callerDepth := CallerDepth(2)
 	switch level {
 	case LevelDebug:
-		s.logger.With("caller", caller(callerDepth)).Debug(msg, args...)
+		s.logger.With("caller", Caller(s.callerDepth)).Debug(msg, args...)
 	case LevelInfo:
-		s.logger.With("caller", caller(callerDepth)).Info(msg, args...)
+		s.logger.With("caller", Caller(s.callerDepth)).Info(msg, args...)
 	case LevelWarn:
-		s.logger.With("caller", caller(callerDepth)).Warn(msg, args...)
+		s.logger.With("caller", Caller(s.callerDepth)).Warn(msg, args...)
 	case LevelError:
-		s.logger.With("caller", caller(callerDepth)).Error(msg, args...)
+		s.logger.With("caller", Caller(s.callerDepth)).Error(msg, args...)
 	case LevelFatal:
-		s.logger.With("caller", caller(callerDepth)).Log(context.Background(), LevelToSlog[LevelFatal], msg, args...)
+		s.logger.With("caller", Caller(s.callerDepth)).Log(context.Background(), LevelToSlog[LevelFatal], msg, args...)
 	}
 }
 
