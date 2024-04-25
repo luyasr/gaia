@@ -2,16 +2,16 @@ package config
 
 import (
 	"testing"
-	"time"
 )
 
 type conf struct {
 	Http Http `json:"http"`
+	Mode string `json:"mode" default:"debug"`
 }
 
 type Http struct {
 	Host string `json:"host" default:"localhost"`
-	Port int    `json:"port" default:"8080"`
+	Port int    `json:"port"`
 }
 
 func TestConfig_Load(t *testing.T) {
@@ -30,5 +30,4 @@ func TestConfig_Load(t *testing.T) {
 	}
 
 	t.Log(cfg)
-	time.Sleep(30 * time.Second)
 }

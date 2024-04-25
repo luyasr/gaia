@@ -34,8 +34,8 @@ func SetDefaultTag(obj any) error {
 
 	for i := 0; i < typeOf.NumField(); i++ {
 		tFiled, vFiled := typeOf.Field(i), valueOf.Field(i)
-		tag, ok := tFiled.Tag.Lookup("default")
-		if vFiled.IsZero() && ok {
+		tag, _ := tFiled.Tag.Lookup("default")
+		if vFiled.IsZero() {
 			switch vFiled.Kind() {
 			case reflect.String:
 				vFiled.SetString(tag)
