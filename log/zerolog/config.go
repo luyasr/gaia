@@ -17,7 +17,7 @@ const (
 // Config defines the configuration for the logger.
 type Config struct {
 	Mode         Mode
-	Filepath     string `default:"."`
+	Filepath     string `default:"logs"`
 	Filename     string `default:"app.log"`
 	MaxSize      int    `default:"100"`
 	MaxBackups   int    `default:"5"`
