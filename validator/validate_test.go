@@ -22,7 +22,7 @@ func isAdult(fl validator.FieldLevel) bool {
 }
 
 var registrationFunc = func(ut ut.Translator) error {
-	return ut.Add("isAdult", "{0}必须是成年人！", true) // see universal-translator for details
+	return ut.Add("isAdult", "{0}必须是成年人", true) // see universal-translator for details
 }
 
 var translateFunc = func(ut ut.Translator, fe validator.FieldError) string {
@@ -32,8 +32,8 @@ var translateFunc = func(ut ut.Translator, fe validator.FieldError) string {
 
 func TestStruct(t *testing.T) {
 	p := Person{
-		// Name: "luya",
-		Age: 14,
+		Name: "luya",
+		Age: 17,
 	}
 	err := Struct(p)
 	if err != nil {
