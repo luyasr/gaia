@@ -102,7 +102,7 @@ func (cfg *Config) Read() error {
 func (cfg *Config) Watch() error {
 	errCh := make(chan error, 1)
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		cfg.log.Infof("Config file changed: %s", e.Name)
+		cfg.log.Infof("config file changed: %s", e.Name)
 		if err := viper.Unmarshal(&cfg.target); err != nil {
 			errCh <- err
 		}
