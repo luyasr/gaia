@@ -9,21 +9,23 @@ import (
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	enTrans "github.com/go-playground/validator/v10/translations/en"
 	zhTrans "github.com/go-playground/validator/v10/translations/zh"
 	"github.com/luyasr/gaia/log"
 )
 
 var (
 	Validate *validator.Validate
-	Trans    ut.Translator
+	TransEn  ut.Translator
+	TransZh  ut.Translator
 )
 
 func init() {
-	setupValidator()
+	initValidator()
 }
 
-// setupValidator initializes the validator and translator.
-func setupValidator() {
+// initValidator initializes the validator and translator.
+func initValidator() {
 	Validate = validator.New()
 
 	// Set up English and Chinese translators.
@@ -32,20 +34,33 @@ func setupValidator() {
 
 	uni := ut.New(enTranslator, zhTranslator)
 
-	// Get the Chinese translator.
-	Trans, _ = uni.GetTranslator("zhTranslator")
+	// Get the English and Chinese translators.
+	TransEn, _ = uni.GetTranslator("en")
+	TransZh, _ = uni.GetTranslator("zh")
 
-	// Register a function to get the custom label in the struct tag as the field name.
-	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
-		name := fld.Tag.Get("label")
-		return name
-	})
-
-	// Register the Chinese translations for the validator.
-	err := zhTrans.RegisterDefaultTranslations(Validate, Trans)
-	if err != nil {
+	// Register the default translations for the English translator.
+	if err := enTrans.RegisterDefaultTranslations(Validate, TransEn); err != nil {
 		log.Fatalf("authenticator registration translator error: %v", err)
 	}
+
+	// Register the default translations for the Chinese translator.
+	if err := zhTrans.RegisterDefaultTranslations(Validate, TransZh); err != nil {
+		log.Fatalf("authenticator registration translator error: %v", err)
+	}
+
+	// Register the tag name function.
+	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
+		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
+		if name == "-" {
+			name = ""
+		}
+		label := fld.Tag.Get("label")
+		if label != "" {
+			name = label
+		}
+
+		return name
+	})
 }
 
 func RegisterValidation(tag string, fn validator.Func) error {
@@ -58,6 +73,11 @@ func RegisterTranslation(tag string, trans ut.Translator, registerFn validator.R
 
 // Struct validates the given struct using the validator and translator.
 func Struct(target any) error {
+	return StructWithLang(target, "zh")
+}
+
+// StructWithLang validates the given struct using the validator and translator with a specific language.
+func StructWithLang(target any, language string) error {
 	err := Validate.Struct(target)
 	if err != nil {
 		var invalidValidationError *validator.InvalidValidationError
@@ -65,12 +85,25 @@ func Struct(target any) error {
 			return errors.New(err.Error())
 		}
 
-		// Translate the validation errors.
-		var errs []string
-		for _, e := range err.(validator.ValidationErrors) {
-			errs = append(errs, e.Translate(Trans))
+		var trans ut.Translator
+		switch language {
+		case "en":
+			trans = TransEn
+		case "zh":
+			trans = TransZh
+		default:
+			trans = TransEn
 		}
-		return errors.New(strings.Join(errs, "; "))
+
+		// Translate the validation errors.
+		sb := strings.Builder{}
+		for _, e := range err.(validator.ValidationErrors) {
+			if sb.Len() > 0 {
+				sb.WriteString("; ")
+			}
+			sb.WriteString(e.Translate(trans))
+		}
+		return errors.New(sb.String())
 	}
 	return nil
 }

@@ -8,13 +8,13 @@ import (
 )
 
 type Person struct {
-	Name string `validate:"required" label:"姓名"`
-	Age  int    `validate:"required,isAdult" label:"年龄"`
+	Name string `json:"name" validate:"required,min=5" label:"姓名"`
+	Age  int    `json:"age" validate:"required,isAdult" label:"年龄"`
 }
 
 func init() {
 	Validate.RegisterValidation("isAdult", isAdult)
-	Validate.RegisterTranslation("isAdult", Trans, registrationFunc, translateFunc)
+	Validate.RegisterTranslation("isAdult", TransEn, registrationFunc, translateFunc)
 }
 
 func isAdult(fl validator.FieldLevel) bool {
@@ -33,7 +33,7 @@ var translateFunc = func(ut ut.Translator, fe validator.FieldError) string {
 func TestStruct(t *testing.T) {
 	p := Person{
 		Name: "luya",
-		Age: 17,
+		Age:  18,
 	}
 	err := Struct(p)
 	if err != nil {
