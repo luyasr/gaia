@@ -77,3 +77,18 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	s.log.Info("http server shutdown...")
 	return s.server.Shutdown(ctx)
 }
+
+func GinLogMode(level string) string {
+	switch level {
+	case "debug":
+		return "debug"
+	case "info":
+		return "release"
+	case "warn":
+		return "release"
+	case "error":
+		return "release"
+	default:
+		return "release"
+	}
+}
